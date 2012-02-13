@@ -1,8 +1,11 @@
 package com.coursemanager.server;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
-import com.coursemanager.handlers.TestHandler;
+import com.coursemanager.servlet.DefaultServlet;
+import com.coursemanager.servlet.ServiceServlet;
 
 public class CourseManagerMain {
 
@@ -15,9 +18,14 @@ public class CourseManagerMain {
 
         loadConfiguration();
 
+        ServletContextHandler handler = new ServletContextHandler();
+        handler.setContextPath("/");
+        handler.addServlet(new ServletHolder(new DefaultServlet()), "/*");
+        handler.addServlet(new ServletHolder(new ServiceServlet()), "/service/*");
+ 
         // Instantiate the server on the specified port
         Server server = new Server(port);
-        server.setHandler(new TestHandler());
+        server.setHandler(handler);
         server.start();
         server.join();
     }
