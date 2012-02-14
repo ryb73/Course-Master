@@ -1,9 +1,15 @@
 package com.coursemanager.server;
 
+import java.util.EnumSet;
+
+import javax.servlet.DispatcherType;
+
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import com.coursemanager.server.filter.RequestVerifier;
 import com.coursemanager.servlet.DefaultServlet;
 import com.coursemanager.servlet.ServiceServlet;
 
@@ -18,14 +24,23 @@ public class CourseManagerMain {
 
         loadConfiguration();
 
-        ServletContextHandler handler = new ServletContextHandler();
-        handler.setContextPath("/");
-        handler.addServlet(new ServletHolder(new DefaultServlet()), "/*");
-        handler.addServlet(new ServletHolder(new ServiceServlet()), "/service/*");
- 
+        ServletContextHandler root = new ServletContextHandler();
+        root.setContextPath("/");
+        root.addFilter(RequestVerifier.class, "/*", EnumSet.noneOf(DispatcherType.class));
+        root.addServlet(new ServletHolder(new DefaultServlet()), "/*");
+        root.addServlet(new ServletHolder(new ServiceServlet()), "/service/*");
+
+        ResourceHandler resourceHandler = new ResourceHandler();
+        //resourceHandler.
+        resourceHandler.setDirectoriesListed(false);
+        resourceHandler.setWelcomeFiles(new String[]{ "index.html" });
+
+        resourceHandler.setResourceBase("./web");
+        root.setHandler(resourceHandler);
+
         // Instantiate the server on the specified port
         Server server = new Server(port);
-        server.setHandler(handler);
+        server.setHandler(root);
         server.start();
         server.join();
     }

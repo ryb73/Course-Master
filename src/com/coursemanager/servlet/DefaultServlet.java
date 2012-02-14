@@ -15,6 +15,6 @@ public class DefaultServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
-        response.getWriter().println("You are viewing a page that falls under the default context");
+        response.getWriter().println("You have reached a page that is covered by the default servlet");
     }
 }
