@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j-default.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+    <appender name="DefaultConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%d{ISO8601}] %c{1}: %m%n"/>
+        </layout>
+        <!--filter class="com.redprairie.refs.log.filters.RootFilter" /-->
+    </appender>
+
+    <appender name="TraceFileAppender" class="org.apache.log4j.FileAppender">
+        <param name="file" value="${user.dir}/logs/REFS.log"/>
+        <param name="Append" value="false" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="Pattern" value="[%d{ISO8601}] %c{1}: %m%n"/>
+        </layout>
+        <!--filter class="com.redprairie.refs.log.filters.RootFilter" /-->
+    </appender>
+
+    <appender name="RollingFileAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="file" value="${user.dir}/logs/REFS.log"/>
+        <param name="MaxFileSize" value="5MB"/>
+        <param name="MaxBackupIndex" value="10"/>
+        <layout class="org.apache.log4j.PatternLayout"> 
+          <param name="ConversionPattern" value="[%d{ISO8601}] %c{1}: %m%n"/>
+        </layout>
+        <!--filter class="com.redprairie.refs.log.filters.RootFilter" /-->
+    </appender>
+
+    <logger name="org.eclipse.jetty">
+        <level value="INFO" />
+    </logger>
+
+    <root>
+        <priority value="INFO"/>
+        <appender-ref ref="DefaultConsoleAppender"/>
+        <!-- <appender-ref ref="RollingFileAppender"/> -->
+    </root>
+    
+</log4j:configuration>
