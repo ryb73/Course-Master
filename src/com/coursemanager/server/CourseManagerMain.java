@@ -4,13 +4,9 @@ import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
@@ -32,20 +28,12 @@ public class CourseManagerMain {
         logger.trace("Spinning up servlets");
         ServletContextHandler root = new ServletContextHandler();
         root.setContextPath("/");
-        root.addFilter(RequestVerifier.class, "/*", EnumSet.noneOf(DispatcherType.class));
+        root.addFilter(RequestVerifier.class, "/*", EnumSet.allOf(DispatcherType.class));
         root.addServlet(new ServletHolder(new DefaultServlet()), "/*");
         root.addServlet(new ServletHolder(new ServiceServlet()), "/service/*");
 
-        ResourceHandler resourceHandler = new ResourceHandler();
-        //resourceHandler.
-        resourceHandler.setDirectoriesListed(false);
-        resourceHandler.setWelcomeFiles(new String[]{ "index.html" });
-
-        resourceHandler.setResourceBase("./web");
-        root.setHandler(resourceHandler);
-
         // Instantiate the server on the specified port
-        logger.info("Server started on port " + port);
+        logger.info("Server starting on port " + port);
         Server server = new Server(port);
         server.setHandler(root);
         server.start();
@@ -53,8 +41,6 @@ public class CourseManagerMain {
     }
 
     private static void initializeLogging() {
-        ConsoleAppender defaultAppender = new ConsoleAppender(new PatternLayout("[%d{ISO8601}] %c{1}: %m%n"));
-        BasicConfigurator.configure(defaultAppender);
         DOMConfigurator.configureAndWatch(log4jSettingsLocation);
     }
 
@@ -65,5 +51,6 @@ public class CourseManagerMain {
 
     private static String log4jSettingsLocation;
     private static int port;
+
     private static Logger logger = Logger.getLogger(CourseManagerMain.class);
 }

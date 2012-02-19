@@ -20,7 +20,9 @@ public class RequestVerifier implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        logger.info("Filtering");
+        logger.trace("Verifying request for resource");
+
+        // Check request path/cookies
 
         chain.doFilter(request, response);
     }
