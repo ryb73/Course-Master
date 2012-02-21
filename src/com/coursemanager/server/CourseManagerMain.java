@@ -11,9 +11,17 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.coursemanager.server.filter.RequestVerifier;
-import com.coursemanager.servlet.DefaultServlet;
 import com.coursemanager.servlet.ServiceServlet;
+import com.coursemanager.servlet.ResourceServlet;
 
+/**
+ * Main server component of the entire project.
+ * Contains the server and all of its configuration,
+ * and assigns the servlets and filtering, as well
+ * as contexts, etc.
+ *
+ * @author Graham
+ */
 public class CourseManagerMain {
 
     /**
@@ -29,7 +37,7 @@ public class CourseManagerMain {
         ServletContextHandler root = new ServletContextHandler();
         root.setContextPath("/");
         root.addFilter(RequestVerifier.class, "/*", EnumSet.allOf(DispatcherType.class));
-        root.addServlet(new ServletHolder(new DefaultServlet()), "/*");
+        root.addServlet(new ServletHolder(new ResourceServlet()), "/*");
         root.addServlet(new ServletHolder(new ServiceServlet()), "/service/*");
 
         // Instantiate the server on the specified port
@@ -40,10 +48,17 @@ public class CourseManagerMain {
         server.join();
     }
 
+    /**
+     * Method to create logger based on log4j settings file.
+     */
     private static void initializeLogging() {
         DOMConfigurator.configureAndWatch(log4jSettingsLocation);
     }
 
+    /**
+     * Method to load configuration settings
+     * TODO Move settings into a file
+     */
     private static void loadConfiguration() {
         log4jSettingsLocation = "settings/log4j.xml";
         port = 8080;

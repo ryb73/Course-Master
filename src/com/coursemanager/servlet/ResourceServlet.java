@@ -11,30 +11,44 @@ import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
-public class DefaultServlet extends HttpServlet {
+/**
+ * The resource servlet acts primarily as a "resource" or file handler
+ * internally, all requests are sent to a resource handler, and if they
+ * aren't found, a message is returned stating this.
+ * 
+ * This servlet exists because I was unable to find a way to "filter"
+ * file requests. All content that reaches this serve has come through
+ * the RequestVerifier class first, so no secure resources leak through.
+ * @author Graham
+ *
+ */
+public class ResourceServlet extends HttpServlet {
 
     /**
      * Constructor the the DefaultServlet
-     * 
-     * The default servlet acts primarily as a "Resource" or file handler
-     * internally, all requests are sent to a resource handler, and if they
-     * aren't found, a message is returned stating this.
-     * 
-     * This servlet exists because I was unable to find a way to "filter"
-     * file requests. All content that reaches this serve has come through
-     * the RequestVerifier class first, so no secure resources leak through.
+     *
+     * Creates resource handler and sets its root directory
      */
-    public DefaultServlet() {
+    public ResourceServlet() {
         resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(false);
         resourceHandler.setWelcomeFiles(new String[]{ "index.html" });
         resourceHandler.setResourceBase("./web");
     }
+
+    /**
+     * Respond to a GET request
+     *
+     * @param request The HTTP Request
+     * @param response The response to write
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info(request.getMethod() + " " + request.getRequestURI());
 
+        // Try to let the resource handler find the requested file
         resourceHandler.handle(request.getRequestURI(), (Request) request, request, response);
 
+        // If the resource handler doesn't find the file, we basically return a 404
         if (!response.isCommitted()) {
             logger.trace("Requested resource not found");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -46,5 +60,5 @@ public class DefaultServlet extends HttpServlet {
     private static ResourceHandler resourceHandler;
 
     private static final long serialVersionUID = 1L;
-    private static Logger logger = Logger.getLogger(DefaultServlet.class);
+    private static Logger logger = Logger.getLogger(ResourceServlet.class);
 }
