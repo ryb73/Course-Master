@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import com.coursemanager.server.Settings;
+
 /**
  * This class filters all requests hitting the server. It is capable of
  * checking for proper sessions and can also redirect unauthorized users
@@ -34,14 +36,23 @@ public class RequestVerifier implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         logger.trace("Verifying request for resource");
 
+        // Convert the requests into Http correspondent
         HttpServletRequest  httpRequest  = (HttpServletRequest)  request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        if (httpRequest.getCookies().length == 0) {
-            httpResponse.addCookie(new Cookie("TestCookie", "TestValue"));
+        if (!containsCookie(httpRequest.getCookies())) {
+            httpResponse.addCookie(Settings.authenticator.login("Junk", "More Junk"));
         }
 
         chain.doFilter(request, response);
+    }
+
+    private boolean containsCookie(Cookie[] cookies) {
+        for (Cookie cookie : cookies)
+            if (cookie.getName().equals(Settings.cookieName))
+                return true;
+
+        return false;
     }
 
     @Override
