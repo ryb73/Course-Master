@@ -1,6 +1,9 @@
 package com.coursemanager.server;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.EnumSet;
+import java.util.Properties;
 
 import javax.servlet.DispatcherType;
 
@@ -11,8 +14,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.coursemanager.server.filter.RequestVerifier;
-import com.coursemanager.servlet.ServiceServlet;
 import com.coursemanager.servlet.ResourceServlet;
+import com.coursemanager.servlet.ServiceServlet;
 
 /**
  * Main server component of the entire project.
@@ -23,6 +26,7 @@ import com.coursemanager.servlet.ResourceServlet;
  * @author Graham
  */
 public class CourseManagerMain {
+    public static final String FILESEPARATOR = System.getProperty("file.separator");
 
     /**
      * Main method, runs the server
@@ -31,7 +35,6 @@ public class CourseManagerMain {
      */
     public static void main(String[] args) throws Exception {
         loadConfiguration();
-        initializeLogging();
 
         logger.trace("Spinning up servlets");
         ServletContextHandler root = new ServletContextHandler();
@@ -49,23 +52,38 @@ public class CourseManagerMain {
     }
 
     /**
-     * Method to create logger based on log4j settings file.
-     */
-    private static void initializeLogging() {
-        DOMConfigurator.configureAndWatch(log4jSettingsLocation);
-    }
-
-    /**
      * Method to load configuration settings
-     * TODO Move settings into a file
      */
     private static void loadConfiguration() {
-        log4jSettingsLocation = "settings/log4j.xml";
-        port = 8080;
+
+        // Check for the CMDIR to be set
+        courseMasterDirectory = System.getenv("CMDIR");
+
+        // If it's null, use the user directory
+        if (courseMasterDirectory == null) {
+            courseMasterDirectory = System.getProperty("user.dir");
+        }
+
+        // Force directory to end with file separator
+        if (!courseMasterDirectory.endsWith(FILESEPARATOR)) {
+            courseMasterDirectory = courseMasterDirectory + FILESEPARATOR;
+        }
+
+        // Attempt to load settings file
+        Properties configProperties = new Properties();
+        try {
+            configProperties.load(new FileInputStream(new File(courseMasterDirectory + "settings" + FILESEPARATOR + "ServerSettings.properties")));
+        }
+        catch(Exception e) {
+            System.err.println("Failed to load configuration files.");
+            System.exit(0);
+        }
+
+        port = Integer.parseInt(configProperties.getProperty("port"));
+        DOMConfigurator.configureAndWatch(courseMasterDirectory + "settings" + FILESEPARATOR  + "log4j.xml");
     }
 
-    private static String log4jSettingsLocation;
     private static int port;
-
+    private static String courseMasterDirectory;
     private static Logger logger = Logger.getLogger(CourseManagerMain.class);
 }

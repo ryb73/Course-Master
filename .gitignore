@@ -1,4 +1,13 @@
 # Compiled Source #
 ###################
-bin\*
+bin/
 *.class
+
+# Specific Settings Files #
+###########################
+ServerSettings.properties
+log4j.xml
+
+# Logs #
+########
+logs/

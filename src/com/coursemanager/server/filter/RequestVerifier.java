@@ -8,6 +8,9 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
@@ -26,13 +29,17 @@ public class RequestVerifier implements Filter {
      *
      * @param request The HTTP Request to inspect
      * @param response The response to write
-     * @param chain The rest of the filter chain to
-     *  pass to if we deem the request OK to continue
+     * @param chain The rest of the filter chain to pass to if we deem the request OK to continue
      */
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         logger.trace("Verifying request for resource");
 
-        // Check request path/cookies
+        HttpServletRequest  httpRequest  = (HttpServletRequest)  request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        if (httpRequest.getCookies().length == 0) {
+            httpResponse.addCookie(new Cookie("TestCookie", "TestValue"));
+        }
 
         chain.doFilter(request, response);
     }

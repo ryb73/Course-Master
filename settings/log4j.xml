@@ -7,26 +7,23 @@
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="[%d{ISO8601}] %c{1}: %m%n"/>
         </layout>
-        <!--filter class="com.redprairie.refs.log.filters.RootFilter" /-->
     </appender>
 
     <appender name="TraceFileAppender" class="org.apache.log4j.FileAppender">
-        <param name="file" value="${user.dir}/logs/REFS.log"/>
+        <param name="file" value="${user.dir}/logs/CourseMaster.log"/>
         <param name="Append" value="false" />
         <layout class="org.apache.log4j.PatternLayout">
             <param name="Pattern" value="[%d{ISO8601}] %c{1}: %m%n"/>
         </layout>
-        <!--filter class="com.redprairie.refs.log.filters.RootFilter" /-->
     </appender>
 
     <appender name="RollingFileAppender" class="org.apache.log4j.RollingFileAppender">
-        <param name="file" value="${user.dir}/logs/REFS.log"/>
+        <param name="file" value="${user.dir}/logs/CourseMaster.log"/>
         <param name="MaxFileSize" value="5MB"/>
         <param name="MaxBackupIndex" value="10"/>
         <layout class="org.apache.log4j.PatternLayout"> 
           <param name="ConversionPattern" value="[%d{ISO8601}] %c{1}: %m%n"/>
         </layout>
-        <!--filter class="com.redprairie.refs.log.filters.RootFilter" /-->
     </appender>
 
     <logger name="org.eclipse.jetty">
