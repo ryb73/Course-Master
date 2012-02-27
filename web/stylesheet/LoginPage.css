@@ -1,0 +1,30 @@
+* {
+  text-align: center;
+  background: #000;
+  color: #FFF;
+  font-family: trebuchet, sans-serif;
+}
+
+.header {
+  padding: 4px 0 1px;
+  margin: -8px;
+  background: #FC0;
+}
+
+.header h1{
+  background: #FC0;
+  color: #000;
+}
+
+.login-box {
+  padding: 20px;
+  border: 4px solid #FC0;
+  width: 420px;
+}
+
+.login-box,
+.login-box * {
+  background: #FFF;
+  color: #000;
+  margin: auto;
+}

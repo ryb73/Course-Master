@@ -1,5 +1,10 @@
 package com.coursemanager.auth;
 
+/**
+ * A class representing a user session
+ *
+ * @author Graham
+ */
 public class Session {
 
     /**

@@ -40,17 +40,69 @@ public class RequestVerifier implements Filter {
         HttpServletRequest  httpRequest  = (HttpServletRequest)  request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        if (!containsCookie(httpRequest.getCookies())) {
-            httpResponse.addCookie(Settings.authenticator.login("Junk", "More Junk"));
+        if (httpRequest.getRequestURI().toLowerCase().matches(".*login.*")) {
+            logger.trace("Login resource request");
+
+            if (httpRequest.getRequestURI().equals("/login.do") && httpRequest.getMethod().equals("POST")) {
+                String username = httpRequest.getParameter("username"),
+                       password = httpRequest.getParameter("password");
+
+                if (username == null || password == null) {
+                    httpResponse.sendRedirect("/");
+                    httpResponse.setStatus(HttpServletResponse.SC_OK);
+                    httpResponse.getWriter().write("Both username and password are required to login");
+                    return;
+                }
+
+                Cookie sessionCookie = Settings.authenticator.login(username, password);
+
+                if (sessionCookie == null) {
+                    httpResponse.sendRedirect("/login.html");
+                    httpResponse.setStatus(HttpServletResponse.SC_OK);
+                    httpResponse.getWriter().write("Failed to login with that username/password combination");
+                    return;
+                }
+
+                httpResponse.addCookie(sessionCookie);
+                httpResponse.sendRedirect("/dashboard.html");
+                httpResponse.setContentLength(0);
+                return;
+            }
+        }
+
+        else if (isSecureRequest(httpRequest.getRequestURI()) && !containsCookie(httpRequest.getCookies())) {
+            httpResponse.sendRedirect("/login.html");
+            httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            httpResponse.setContentLength(0);
+            return;
         }
 
         chain.doFilter(request, response);
     }
 
+    /**
+     * Method to determine whether the request being made
+     * is for a secure resource.
+     *
+     * @param requestURI The URI of the request
+     * @return Whether the request is for a secure resource
+     */
+    private boolean isSecureRequest(String requestURI) {
+        return !requestURI.matches("/(favicon.ico|image/).*$");
+    }
+
+    /**
+     * Method to determine if the request has a valid session
+     * cookie attached
+     *
+     * @param cookies All the cookies that came with the request
+     * @return Whether there is a valid session cookie
+     */
     private boolean containsCookie(Cookie[] cookies) {
         for (Cookie cookie : cookies)
-            if (cookie.getName().equals(Settings.cookieName))
-                return true;
+            if (cookie.getName().equals(Settings.cookieName) && 
+                Settings.authenticator.hasSession(cookie.getValue()))
+                    return true;
 
         return false;
     }

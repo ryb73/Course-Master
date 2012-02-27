@@ -32,7 +32,7 @@ public class ResourceServlet extends HttpServlet {
     public ResourceServlet() {
         resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(false);
-        resourceHandler.setWelcomeFiles(new String[]{ "index.html" });
+        resourceHandler.setWelcomeFiles(new String[]{ "dashboard.html" });
         resourceHandler.setResourceBase("./web");
     }
 
@@ -43,6 +43,27 @@ public class ResourceServlet extends HttpServlet {
      * @param response The response to write
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        logger.info(request.getMethod() + " " + request.getRequestURI());
+
+        // Try to let the resource handler find the requested file
+        resourceHandler.handle(request.getRequestURI(), (Request) request, request, response);
+
+        // If the resource handler doesn't find the file, we basically return a 404
+        if (!response.isCommitted()) {
+            logger.trace("Requested resource not found");
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setContentType("text/html");
+            response.getWriter().println("<h1>Resource Not Found</h1><br/>Sorry, the resource you've requested could not be located.");
+        }
+    }
+
+    /**
+     * Respond to a POST request
+     *
+     * @param request The HTTP Request
+     * @param response The response to write
+     */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info(request.getMethod() + " " + request.getRequestURI());
 
         // Try to let the resource handler find the requested file

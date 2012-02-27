@@ -9,6 +9,12 @@ import org.apache.log4j.xml.DOMConfigurator;
 import com.coursemanager.auth.Authenticator;
 import com.coursemanager.auth.MockAuthenticator;
 
+/**
+ * A class representing this Server's settings.
+ * Note that all variables are globally accessible.
+ *
+ * @author Graham
+ */
 public class Settings {
     public static final String FILESEPARATOR = System.getProperty("file.separator");
     public static String courseMasterDirectory;
