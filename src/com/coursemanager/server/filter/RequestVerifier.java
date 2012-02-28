@@ -40,43 +40,15 @@ public class RequestVerifier implements Filter {
         HttpServletRequest  httpRequest  = (HttpServletRequest)  request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        if (httpRequest.getRequestURI().toLowerCase().matches(".*login.*")) {
-            logger.trace("Login resource request");
-
-            if (httpRequest.getRequestURI().equals("/login.do") && httpRequest.getMethod().equals("POST")) {
-                String username = httpRequest.getParameter("username"),
-                       password = httpRequest.getParameter("password");
-
-                if (username == null || password == null) {
-                    httpResponse.sendRedirect("/");
-                    httpResponse.setStatus(HttpServletResponse.SC_OK);
-                    httpResponse.getWriter().write("Both username and password are required to login");
-                    return;
-                }
-
-                Cookie sessionCookie = Settings.authenticator.login(username, password);
-
-                if (sessionCookie == null) {
-                    httpResponse.sendRedirect("/login.html");
-                    httpResponse.setStatus(HttpServletResponse.SC_OK);
-                    httpResponse.getWriter().write("Failed to login with that username/password combination");
-                    return;
-                }
-
-                httpResponse.addCookie(sessionCookie);
-                httpResponse.sendRedirect("/dashboard.html");
-                httpResponse.setContentLength(0);
-                return;
-            }
-        }
-
-        else if (isSecureRequest(httpRequest.getRequestURI()) && !containsCookie(httpRequest.getCookies())) {
+        // Users who request secure content without
+        // a session are redirected to the login page
+        if (!isInsecureRequest(httpRequest.getRequestURI()) && !containsCookie(httpRequest, httpResponse)) {
             httpResponse.sendRedirect("/login.html");
             httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            httpResponse.setContentLength(0);
             return;
         }
 
+        // Bump it down the chain if it's ok
         chain.doFilter(request, response);
     }
 
@@ -87,8 +59,10 @@ public class RequestVerifier implements Filter {
      * @param requestURI The URI of the request
      * @return Whether the request is for a secure resource
      */
-    private boolean isSecureRequest(String requestURI) {
-        return !requestURI.matches("/(favicon.ico|image/).*$");
+    private boolean isInsecureRequest(String requestURI) {
+        return (requestURI.toLowerCase().contains("login") ||
+                requestURI.equals("/favicon.ico") ||
+                requestURI.startsWith("/image/"));
     }
 
     /**
@@ -98,11 +72,23 @@ public class RequestVerifier implements Filter {
      * @param cookies All the cookies that came with the request
      * @return Whether there is a valid session cookie
      */
-    private boolean containsCookie(Cookie[] cookies) {
-        for (Cookie cookie : cookies)
-            if (cookie.getName().equals(Settings.cookieName) && 
-                Settings.authenticator.hasSession(cookie.getValue()))
+    private boolean containsCookie(HttpServletRequest request, HttpServletResponse response) {
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals(Settings.cookieName)) {
+
+                // If the cookie matches the server cookie, look
+                // for that cookie in the current list of sessions
+                if(Settings.authenticator.hasSession(cookie.getValue())) {
+                    request.setAttribute("session", Settings.authenticator.getSession(cookie.getValue()));
                     return true;
+                }
+            
+                // If the user has a cookie that matches this servers cookie, but the
+                // server doesn't recognize the cookie, revoke the cookie
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+            }
+        }
 
         return false;
     }

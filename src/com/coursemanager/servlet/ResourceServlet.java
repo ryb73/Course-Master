@@ -11,11 +11,13 @@ import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
+import com.coursemanager.server.Settings;
+
 /**
  * The resource servlet acts primarily as a "resource" or file handler
  * internally, all requests are sent to a resource handler, and if they
  * aren't found, a message is returned stating this.
- * 
+ *
  * This servlet exists because I was unable to find a way to "filter"
  * file requests. All content that reaches this serve has come through
  * the RequestVerifier class first, so no secure resources leak through.
@@ -32,8 +34,9 @@ public class ResourceServlet extends HttpServlet {
     public ResourceServlet() {
         resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(false);
+        resourceHandler.setCacheControl("no-store,no-cache,must-revalidate");
         resourceHandler.setWelcomeFiles(new String[]{ "dashboard.html" });
-        resourceHandler.setResourceBase("./web");
+        resourceHandler.setResourceBase(Settings.courseMasterDirectory + "/web");
     }
 
     /**

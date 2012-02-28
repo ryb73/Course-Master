@@ -45,10 +45,21 @@ public abstract class Authenticator {
     /**
      * Method to check if a specified
      * session exists in the system
+     *
      * @param sessionKey The key to look for
      * @return Whether the key exists in the session list
      */
     public boolean hasSession(String sessionKey) {
         return sessions.containsKey(sessionKey);
+    }
+
+    /**
+     * Method to retrieve a specified session
+     *
+     * @param sessionKey The key of the desired session
+     * @return The session for the sessionKey
+     */
+    public Session getSession(String sessionKey) {
+        return sessions.get(sessionKey);
     }
 }

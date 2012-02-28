@@ -5,6 +5,6 @@
         <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
     </head>
     <body>
-        <h1>You are logged in</h1>
+        <h1>You are logged in as ##USERNAME##</h1>
     </body>
 </html>

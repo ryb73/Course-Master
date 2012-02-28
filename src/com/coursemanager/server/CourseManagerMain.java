@@ -10,6 +10,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.coursemanager.server.filter.RequestVerifier;
+import com.coursemanager.servlet.ActionServlet;
 import com.coursemanager.servlet.ResourceServlet;
 import com.coursemanager.servlet.ServiceServlet;
 
@@ -36,7 +37,8 @@ public class CourseManagerMain {
         root.setContextPath("/");
         root.addFilter(RequestVerifier.class, "/*", EnumSet.allOf(DispatcherType.class));
         root.addServlet(new ServletHolder(new ResourceServlet()), "/*");
-        root.addServlet(new ServletHolder(new ServiceServlet()), "/service/*");
+        root.addServlet(new ServletHolder(new ActionServlet()),   "/action/*");
+        root.addServlet(new ServletHolder(new ServiceServlet()),  "/service/*");
 
         // Instantiate the server on the specified port
         logger.info("Server starting on port " + Settings.port);
