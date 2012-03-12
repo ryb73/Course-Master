@@ -60,9 +60,8 @@ public class RequestVerifier implements Filter {
      * @return Whether the request is for a secure resource
      */
     private boolean isInsecureRequest(String requestURI) {
-        return (requestURI.toLowerCase().contains("login") ||
-                requestURI.equals("/favicon.ico") ||
-                requestURI.startsWith("/image/"));
+        return requestURI.toLowerCase().contains("login") ||
+               requestURI.equals("/favicon.ico");
     }
 
     /**

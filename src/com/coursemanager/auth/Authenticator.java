@@ -21,7 +21,7 @@ public abstract class Authenticator {
     /**
      * Base login method, to be overridden
      * @param username The username
-     * @param password The passowrd
+     * @param password The password
      * @return A cookie on valid credentials, or null
      */
     public abstract Cookie login(String username, String password);
@@ -38,8 +38,11 @@ public abstract class Authenticator {
         // Add the session to the list
         sessions.put(sessionKey, new Session(user));
 
-        // Return the session
-        return new Cookie(Settings.cookieName, sessionKey);
+        // Generate and return the session
+        Cookie sessionCookie =  new Cookie(Settings.cookieName, sessionKey);
+        sessionCookie.setPath("/");
+
+        return sessionCookie;
     }
 
     /**

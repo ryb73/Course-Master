@@ -1,0 +1,12 @@
+.page-header {
+  background: #000;
+  border: 0;
+  color: #FC0;
+  padding: 15px;
+}
+
+.page-header.title {
+  font-weight: bold;
+  font-size: 2em;
+  padding: 10px;
+}
