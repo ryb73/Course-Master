@@ -5,8 +5,8 @@
         <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
 
         <!-- Ext JS Framework -->
-        <link rel="stylesheet" type="text/css" href="/javascript/extjs/resources/css/ext-all.css">
-        <script type="text/javascript" src="/javascript/extjs/ext-all-debug.js"></script>
+        <link rel="stylesheet" type="text/css" href="/3rdparty/extjs/resources/css/ext-all.css">
+        <script type="text/javascript" src="/3rdparty/extjs/ext-all-debug.js"></script>
 
         <link rel="stylesheet" type="text/css" href="/stylesheet/Main.css" />
         <script type="text/javascript" src="/javascript/Dashboard.js"></script>
