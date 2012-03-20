@@ -1,4 +1,4 @@
-package com.coursemanager.server;
+package com.coursemaster.server;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,8 +6,9 @@ import java.util.Properties;
 
 import org.apache.log4j.xml.DOMConfigurator;
 
-import com.coursemanager.auth.Authenticator;
-import com.coursemanager.auth.MockAuthenticator;
+import com.coursemaster.auth.Authenticator;
+import com.coursemaster.auth.MockAuthenticator;
+import com.coursemaster.database.DatabaseConnectionManager;
 
 /**
  * A class representing this Server's settings.
@@ -16,12 +17,17 @@ import com.coursemanager.auth.MockAuthenticator;
  * @author Graham
  */
 public class Settings {
+    // System Settings
     public static final String FILESEPARATOR = System.getProperty("file.separator");
     public static String courseMasterDirectory;
 
+    // Web information
     public static int port;
 
-    public static String authenticationMode;
+    // Database Config
+    public static DatabaseConnectionManager dbManager;
+
+    // Authentication Parts
     public static Authenticator authenticator;
     public static String cookieName;
 
@@ -43,31 +49,48 @@ public class Settings {
             courseMasterDirectory = courseMasterDirectory + FILESEPARATOR;
         }
 
+        // Initialize logging
+        DOMConfigurator.configureAndWatch(courseMasterDirectory + "settings" + FILESEPARATOR  + "log4j.xml");
+
         // Attempt to load settings file
         Properties configProperties = new Properties();
         try {
             configProperties.load(new FileInputStream(new File(courseMasterDirectory + "settings" + FILESEPARATOR + "ServerSettings.properties")));
 
             port = Integer.parseInt(configProperties.getProperty("port"));
-            authenticationMode = configProperties.getProperty("auth");
 
-            if (authenticationMode == null || !authenticationMode.matches("Mock")) {
-                throw new IllegalArgumentException("Invalid authentication type");
-            }
-
-            if (authenticationMode.equals("Mock")) {
+            String authenticationMode = configProperties.getProperty("auth");
+            if (authenticationMode == null || authenticationMode.equals("Mock")) {
                 authenticator = new MockAuthenticator();
+            }
+            else {
+                throw new IllegalArgumentException("Invalid authentication type");
             }
 
             // Load the cookie name
             cookieName = configProperties.getProperty("cookie");
+
+            // Load Database configuration
+            String cmdb = configProperties.getProperty("cmdb");
+            String dbloc = configProperties.getProperty("dblocation");
+            String dbuser = configProperties.getProperty("dbuser");
+            String dbpass = configProperties.getProperty("dbpass");
+
+            String dbConnector = configProperties.getProperty("connector");
+            if (dbConnector == null) {
+                throw new IllegalArgumentException("Missing Database Connector");
+            }
+            else if(dbConnector.equalsIgnoreCase("mysql")) {
+                DatabaseConnectionManager.init(dbConnector, dbloc, cmdb, dbuser, dbpass);
+            }
+            else {
+                throw new IllegalArgumentException("Unrecognized Database Connector");
+            }
         }
         catch(Exception e) {
             System.err.println("Failed to load configuration settings.");
             e.printStackTrace();
             System.exit(0);
         }
-
-        DOMConfigurator.configureAndWatch(courseMasterDirectory + "settings" + FILESEPARATOR  + "log4j.xml");
     }
 }

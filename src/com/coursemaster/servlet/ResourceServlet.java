@@ -1,4 +1,4 @@
-package com.coursemanager.servlet;
+package com.coursemaster.servlet;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
-import com.coursemanager.server.Settings;
+import com.coursemaster.server.Settings;
 
 /**
  * The resource servlet acts primarily as a "resource" or file handler

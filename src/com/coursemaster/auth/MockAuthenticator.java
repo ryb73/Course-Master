@@ -1,4 +1,4 @@
-package com.coursemanager.auth;
+package com.coursemaster.auth;
 
 import javax.servlet.http.Cookie;
 

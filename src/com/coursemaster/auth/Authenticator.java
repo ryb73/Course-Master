@@ -1,4 +1,4 @@
-package com.coursemanager.auth;
+package com.coursemaster.auth;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import javax.servlet.http.Cookie;
 
-import com.coursemanager.server.Settings;
+import com.coursemaster.server.Settings;
 
 /**
  * Base class for authentication, designed to support interfacing

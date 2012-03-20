@@ -1,4 +1,4 @@
-package com.coursemanager.servlet;
+package com.coursemaster.servlet;
 
 import java.io.IOException;
 
@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.coursemanager.auth.Session;
-import com.coursemanager.server.Settings;
-import com.coursemanager.servlet.util.FileUtil;
+import com.coursemaster.auth.Session;
+import com.coursemaster.server.Settings;
+import com.coursemaster.servlet.util.FileUtil;
 
 /**
  * This servlet acts as a sort of basic function servlet.

@@ -1,4 +1,4 @@
-package com.coursemanager.server.filter;
+package com.coursemaster.server.filter;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.coursemanager.server.Settings;
+import com.coursemaster.server.Settings;
 
 /**
  * This class filters all requests hitting the server. It is capable of

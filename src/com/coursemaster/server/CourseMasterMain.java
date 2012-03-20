@@ -1,4 +1,4 @@
-package com.coursemanager.server;
+package com.coursemaster.server;
 
 import java.util.EnumSet;
 
@@ -9,10 +9,10 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-import com.coursemanager.server.filter.RequestVerifier;
-import com.coursemanager.servlet.ActionServlet;
-import com.coursemanager.servlet.ResourceServlet;
-import com.coursemanager.servlet.ServiceServlet;
+import com.coursemaster.server.filter.RequestVerifier;
+import com.coursemaster.servlet.ActionServlet;
+import com.coursemaster.servlet.ResourceServlet;
+import com.coursemaster.servlet.ServiceServlet;
 
 /**
  * Main server component of the entire project.
@@ -22,7 +22,7 @@ import com.coursemanager.servlet.ServiceServlet;
  *
  * @author Graham
  */
-public class CourseManagerMain {
+public class CourseMasterMain {
 
     /**
      * Main method, runs the server
@@ -48,5 +48,5 @@ public class CourseManagerMain {
         server.join();
     }
 
-    private static Logger logger = Logger.getLogger(CourseManagerMain.class);
+    private static Logger logger = Logger.getLogger(CourseMasterMain.class);
 }

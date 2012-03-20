@@ -1,4 +1,4 @@
-package com.coursemanager.servlet.util;
+package com.coursemaster.servlet.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.coursemanager.server.Settings;
+import com.coursemaster.server.Settings;
 
 /**
  * Utility class for ease of file reading

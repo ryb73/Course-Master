@@ -1,4 +1,4 @@
-package com.coursemanager.servlet;
+package com.coursemaster.servlet;
 
 import java.io.IOException;
 

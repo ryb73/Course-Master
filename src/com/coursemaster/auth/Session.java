@@ -1,4 +1,4 @@
-package com.coursemanager.auth;
+package com.coursemaster.auth;
 
 /**
  * A class representing a user session
