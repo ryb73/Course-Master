@@ -9,6 +9,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import com.coursemaster.database.DatabaseConnectionManager;
 import com.coursemaster.server.filter.RequestVerifier;
 import com.coursemaster.servlet.ActionServlet;
 import com.coursemaster.servlet.ResourceServlet;
@@ -31,6 +32,13 @@ public class CourseMasterMain {
      */
     public static void main(String[] args) throws Exception {
         Settings.loadConfiguration();
+
+        logger.trace("Checking arguments");
+        for (String arg : args) {
+            if (arg.equals("-create-database")) {
+                DatabaseConnectionManager.setupDatabase();
+            }
+        }
 
         logger.trace("Spinning up servlets");
         ServletContextHandler root = new ServletContextHandler();

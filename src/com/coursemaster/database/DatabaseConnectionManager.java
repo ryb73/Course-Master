@@ -3,6 +3,7 @@ package com.coursemaster.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
@@ -47,7 +48,7 @@ public abstract class DatabaseConnectionManager {
             getConnection();
         }
         catch (SQLException e) {
-            logger.fatal("Unable to create session with database: " + e.getMessage());
+            logger.fatal("Unable to create session with database:\n" + e.getMessage());
             System.exit(0);
         }
     }
@@ -61,5 +62,112 @@ public abstract class DatabaseConnectionManager {
         return DriverManager.getConnection(connectionString, username, password);
     }
 
+    /**
+     * Create necessary tables
+     */
+    public static void setupDatabase() {
+        try {
+            Connection con = getConnection();
+            Statement stmt = con.createStatement();
+            stmt.execute(USER_TABLE_SCRIPT);
+            stmt.execute(COURSE_TABLE_SCRIPT);
+            stmt.execute(ENROLLMENT_TABLE_SCRIPT);
+            stmt.execute(EVENT_TABLE_SCRIPT);
+            stmt.execute(FOLDER_TABLE_SCRIPT);
+            stmt.execute(SUBMISSION_TABLE_SCRIPT);
+            stmt.execute(DISCUSSION_BOARD_TABLE_SCRIPT);
+            stmt.execute(DISCUSSION_POST_TABLE_SCRIPT);
+            stmt.execute(DISCUSSION_TOPIC_TABLE_SCRIPT);
+        }
+        catch (SQLException e) {
+           logger.fatal("An exception was thrown while creating the tables, causing the process to fail:\n" + e.getMessage());
+           System.exit(0);
+        }
+    }
+
     private static Logger logger = Logger.getLogger(DatabaseConnectionManager.class);
+
+    private static final String USER_TABLE_SCRIPT =
+        "create table user(" +
+        "id       INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+        "fullname VARCHAR(32)  NOT NULL," +
+        "email    VARCHAR(32)  NOT NULL," +
+        "password VARCHAR(256) NOT NULL," +
+        "role     INT          NOT NULL);";
+    private static final String COURSE_TABLE_SCRIPT =
+        "create table course(" +
+        "id   INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+        "name VARCHAR(256) NOT NULL," +
+        "prof INT          NOT NULL," +
+        "dept VARCHAR(128) NOT NULL," +
+        "num  INT          NOT NULL," +
+        "sect INT          NOT NULL," +
+        "cred INT          NOT NULL," +
+        "sem  VARCHAR(16)  NOT NULL," +
+        "FOREIGN KEY (prof) REFERENCES user(id));";
+    private static final String ENROLLMENT_TABLE_SCRIPT =
+        "create table enrollment(" +
+        "user   INT NOT NULL," +
+        "course INT NOT NULL," +
+        "role   INT NOT NULL," +
+        "FOREIGN KEY (user)   REFERENCES user(id)," +
+        "FOREIGN KEY (course) REFERENCES course(id));";
+    private static final String EVENT_TABLE_SCRIPT =
+        "create table event(" +
+        "id     INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+        "name   VARCHAR(256) NOT NULL," +
+        "descr  VARCHAR(512) NOT NULL," +
+        "start  DATETIME     NOT NULL," +
+        "end    DATETIME     NOT NULL," +
+        "disp   DATETIME     NOT NULL," +
+        "owner  INT          NOT NULL," +
+        "course INT," +
+        "type   INT," +
+        "FOREIGN KEY (owner)  REFERENCES user(id)," +
+        "FOREIGN KEY (course) REFERENCES course(id));";
+    private static final String FOLDER_TABLE_SCRIPT =
+        "create table folder(" +
+        "id     INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+        "name   VARCHAR(128) NOT NULL," +
+        "course INT          NOT NULL," +
+        "ext    VARCHAR(256)," +
+        "start  DATETIME     NOT NULL," +
+        "end    DATETIME     NOT NULL," +
+        "disp   DATETIME     NOT NULL," +
+        "FOREIGN KEY (course) REFERENCES course(id));";
+    private static final String SUBMISSION_TABLE_SCRIPT =
+        "create table submission(" +
+        "id     INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+        "folder INT NOT NULL," +
+        "path   INT NOT NULL," +
+        "name   VARCHAR(128) NOT NULL," +
+        "owner  INT NOT NULL," +
+        "dte   DATETIME NOT NULL," +
+        "FOREIGN KEY (folder) REFERENCES folder(id)," +
+        "FOREIGN KEY (owner)  REFERENCES user(id));";
+    private static final String DISCUSSION_BOARD_TABLE_SCRIPT =
+        "create table discussion_board(" +
+        "id     INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+        "name   VARCHAR(256) NOT NULL," +
+        "course INT          NOT NULL," +
+        "status INT          NOT NULL," +
+        "FOREIGN KEY (course) REFERENCES course(id));";
+    private static final String DISCUSSION_TOPIC_TABLE_SCRIPT =
+        "create table discussion_topic(" +
+        "id     INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+        "board  INT          NOT NULL," +
+        "root   INT          NOT NULL," +
+        "name   VARCHAR(256) NOT NULL," +
+        "status INT          NOT NULL," +
+        "FOREIGN KEY (board) REFERENCES discussion_board(id)," +
+        "FOREIGN KEY (root)  REFERENCES discussion_post(id));";
+    private static final String DISCUSSION_POST_TABLE_SCRIPT =
+        "create table discussion_post(" +
+        "id      INT           NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+        "owner   INT           NOT NULL," +
+        "parent  INT           NOT NULL," +
+        "dte     DATETIME      NOT NULL," +
+        "content VARCHAR(1024) NOT NULL," +
+        "FOREIGN KEY (owner)  REFERENCES user(id)," +
+        "FOREIGN KEY (parent) REFERENCES discussion_post(id));";
 }
