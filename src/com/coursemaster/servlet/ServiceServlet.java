@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import com.coursemaster.auth.Session;
+import com.coursemaster.servlet.util.FileUtil;
+
 /**
  * The servlet for services requests, likely
  * those that have business logic or database requests.
@@ -27,8 +30,11 @@ public class ServiceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info(request.getMethod() + " " + request.getRequestURI());
 
-        response.setContentType("text/html");
-        response.getWriter().println("Service servlet responding to GET request");
+        String function = request.getRequestURI().substring(9).toLowerCase();
+
+        if (function.equals("dashboard")) {
+            doDashboard(request, response);
+        }
     }
 
 
@@ -43,6 +49,25 @@ public class ServiceServlet extends HttpServlet {
 
         response.setContentType("text/html");
         response.getWriter().println("Service servlet responding to POST request");
+    }
+
+    /**
+     * Method to generate a dashboard for a user
+     *
+     * @param request The HTTP Request
+     * @param response The HTTP Response
+     */
+    private void doDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Open the template file
+        String dashboardAsString = FileUtil.loadTemplateFile("dashboard.tpl");
+
+        Session session = (Session) request.getAttribute("session");
+
+        // Replace dashboard content with specified user's content
+        dashboardAsString = dashboardAsString.replace("##USERNAME##", session.getUsername());
+
+        response.getWriter().write(dashboardAsString);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     private static final long serialVersionUID = 1L;

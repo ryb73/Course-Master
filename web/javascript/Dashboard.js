@@ -1,25 +1,25 @@
-Ext.onReady(function() {
-    Ext.create('Ext.container.Viewport', {
-        layout: 'border',
-        items: [{
-            region: 'north',
-            height: 50,
+Ext.define("CM.Dashboard", {
+    extend: "Ext.panel.Panel",
+
+    initComponent: function() {
+        Ext.apply(this, {
             border: false,
-            layout: 'hbox',
+            height: '100%',
+            layout: {
+                type: 'hbox',
+                align: 'stretch'
+            },
             items: [{
-                bodyCls: 'page-header title',
-                flex: 1,
-                html: 'Course Master'
+                border: false,
+                html: 'class schedule panel',
+                flex: 1
             }, {
-                bodyCls: 'page-header',
-                flex: 1,
-                style: 'text-align:right;',
-                html: '<div>Logged in as: ' + user.id + '</div>'
+                border: false,
+                html: 'calendar panel',
+                flex: 3
             }]
-        },{
-            region: 'center',
-            border: false,
-            html : '<div>Hello ' + user.id + '! Welcome to Ext JS.</div>'
-        }]
-    });
+        });
+
+        this.callParent(arguments);
+    }
 });

@@ -10,18 +10,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.coursemaster.auth.Session;
 import com.coursemaster.server.Settings;
-import com.coursemaster.servlet.util.FileUtil;
 
 /**
  * This servlet acts as a sort of basic function servlet.
  * It is primarily responsible for session management actions
- * such as logging users in and out, and also for loading a
- * user's dashboard
- *
- * TODO Dashboard functionality should probably be in Service servlet,
- *      since it is likely going to be loading a lot of the user's data
+ * such as logging users in and out
  *
  * @author Graham
  */
@@ -36,11 +30,7 @@ public class ActionServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info(request.getMethod() + " " + request.getRequestURI());
 
-        String function = request.getRequestURI().substring(8).toLowerCase();
-
-        if (function.equals("dashboard")) {
-            doDashboard(request, response);
-        }
+        //String function = request.getRequestURI().substring(8).toLowerCase();
     }
 
     /**
@@ -57,25 +47,6 @@ public class ActionServlet extends HttpServlet {
         if (function.equals("login")) {
             doLogin(request, response);
         }
-    }
-
-    /**
-     * Method to generate a dashboard for a user
-     *
-     * @param request The HTTP Request
-     * @param response The HTTP Response
-     */
-    private void doDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Open the template file
-        String dashboardAsString = FileUtil.loadTemplateFile("dashboard.tpl");
-
-        Session session = (Session) request.getAttribute("session");
-
-        // Replace dashboard content with specified user's content
-        dashboardAsString = dashboardAsString.replace("##USERNAME##", session.getUsername());
-
-        response.getWriter().write(dashboardAsString);
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     /**
@@ -106,7 +77,7 @@ public class ActionServlet extends HttpServlet {
         }
 
         response.addCookie(sessionCookie);
-        response.sendRedirect("/action/dashboard");
+        response.sendRedirect("/service/dashboard");
         response.setContentLength(0);
     }
 
