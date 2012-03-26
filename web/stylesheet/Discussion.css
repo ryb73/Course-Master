@@ -1,0 +1,31 @@
+.discussion-post {
+	width: 100%;
+	float: left
+}
+
+.poster-info {
+	width: 25%;
+	min-height: 200px;
+	margin: 3px;
+	padding: 5px;
+	background: #9CF;
+	float: left
+}
+
+.poster-info h1 {
+	font-size: 1.7em;
+	margin-bottom: 5px
+}
+
+.poster-info h2 {
+	font-weight: normal
+}
+
+.post-content {
+	width: 72%;
+	min-height: 200px;
+	margin: 3px;
+	padding: 5px;
+	background: #9CF;
+	float: left
+}

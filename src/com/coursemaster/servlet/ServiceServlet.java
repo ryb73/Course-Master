@@ -30,10 +30,14 @@ public class ServiceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info(request.getMethod() + " " + request.getRequestURI());
 
+        response.setContentType("text/html");
         String function = request.getRequestURI().substring(9).toLowerCase();
 
         if (function.equals("dashboard")) {
             doDashboard(request, response);
+        
+        else if(function.equals("discussion")) {
+            doDiscussion(request, response);
         }
     }
 
@@ -49,6 +53,25 @@ public class ServiceServlet extends HttpServlet {
 
         response.setContentType("text/html");
         response.getWriter().println("Service servlet responding to POST request");
+    }
+
+    /**
+     * Method to generate a discussion board
+     *
+     * @param request The HTTP Request
+     * @param response The HTTP Response
+     */
+    private void doDiscussion(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Open the template file
+        String discussionAsString = FileUtil.loadTemplateFile("discussion.tpl");
+
+        Session session = (Session) request.getAttribute("session");
+
+        // Replace discussion board content with specified user's content
+        discussionAsString = discussionAsString.replace("##USERNAME##", session.getUsername());
+
+        response.getWriter().write(discussionAsString);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     /**
