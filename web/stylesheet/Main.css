@@ -10,3 +10,22 @@
   font-size: 2em;
   padding: 10px;
 }
+
+.classes-sidebar {
+  padding: 10px
+}
+
+.classes-menu-item {
+	border: 0
+}
+
+.classes-menu-item a, .classes-menu-item a:visited {
+	color: #009;
+	text-decoration: none;
+	font-size: 1.5em
+}
+
+.classes-menu-item li a, .classes-menu-item li a:visited {
+	font-size: 1em;
+	margin-left: 5px
+}
