@@ -5,21 +5,21 @@
         <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
 
         <!-- Ext JS Framework -->
-        <link rel="stylesheet" type="text/css" href="/javascript/extjs/resources/css/ext-all.css">
-        <script type="text/javascript" src="/javascript/extjs/ext-all-debug.js"></script>
+        <link rel="stylesheet" type="text/css" href="/3rdparty/extjs/resources/css/ext-all.css">
+        <script type="text/javascript" src="/3rdparty/extjs/ext-all-debug.js"></script>
 
         <link rel="stylesheet" type="text/css" href="/stylesheet/Main.css" />
 
-		<link rel="stylesheet" type="text/css" href="/stylesheet/Discussion.css" />
-		<script type="text/javascript" src="/javascript/Discussion.js"></script>
+        <link rel="stylesheet" type="text/css" href="/stylesheet/Discussion.css" />
+        <script type="text/javascript" src="/javascript/Discussion.js"></script>
     </head>
     <body>
-		<!-- Used by Ext.History -->
-		<form id="history-form" class="x-hide-display">
-			<input type="hidden" id="x-history-field" />
-			<iframe id="x-history-frame"></iframe>
-		</form>
-		<script type="text/javascript">
+        <!-- Used by Ext.History -->
+        <form id="history-form" class="x-hide-display">
+            <input type="hidden" id="x-history-field" />
+            <iframe id="x-history-frame"></iframe>
+        </form>
+        <script type="text/javascript">
             var user = {
                 id: '##USERNAME##'
             }

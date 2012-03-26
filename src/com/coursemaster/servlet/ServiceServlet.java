@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.coursemaster.auth.Session;
-import com.coursemaster.servlet.util.FileUtil;
+import com.coursemaster.service.Dashboard;
+import com.coursemaster.service.Discussion;
 
 /**
  * The servlet for services requests, likely
@@ -34,10 +34,10 @@ public class ServiceServlet extends HttpServlet {
         String function = request.getRequestURI().substring(9).toLowerCase();
 
         if (function.equals("dashboard")) {
-            doDashboard(request, response);
-        
+            new Dashboard().doRequest(request, response);
+        }
         else if(function.equals("discussion")) {
-            doDiscussion(request, response);
+            new Discussion().doRequest(request, response);
         }
     }
 
@@ -53,44 +53,6 @@ public class ServiceServlet extends HttpServlet {
 
         response.setContentType("text/html");
         response.getWriter().println("Service servlet responding to POST request");
-    }
-
-    /**
-     * Method to generate a discussion board
-     *
-     * @param request The HTTP Request
-     * @param response The HTTP Response
-     */
-    private void doDiscussion(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Open the template file
-        String discussionAsString = FileUtil.loadTemplateFile("discussion.tpl");
-
-        Session session = (Session) request.getAttribute("session");
-
-        // Replace discussion board content with specified user's content
-        discussionAsString = discussionAsString.replace("##USERNAME##", session.getUsername());
-
-        response.getWriter().write(discussionAsString);
-        response.setStatus(HttpServletResponse.SC_OK);
-    }
-
-    /**
-     * Method to generate a dashboard for a user
-     *
-     * @param request The HTTP Request
-     * @param response The HTTP Response
-     */
-    private void doDashboard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Open the template file
-        String dashboardAsString = FileUtil.loadTemplateFile("dashboard.tpl");
-
-        Session session = (Session) request.getAttribute("session");
-
-        // Replace dashboard content with specified user's content
-        dashboardAsString = dashboardAsString.replace("##USERNAME##", session.getUsername());
-
-        response.getWriter().write(dashboardAsString);
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     private static final long serialVersionUID = 1L;
