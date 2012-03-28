@@ -12,6 +12,8 @@ Ext.define("CM.Sidebar.Class", {
             handler: this.clickFunction
         });
 
+        PageGlobals.contentPanel.add(new CM.Class.Home({ class: this.initialConfig.class }));
+
         this.callParent(arguments);
     },
 
