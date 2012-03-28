@@ -131,7 +131,7 @@ Ext.onReady(function() {
             bodyCls: 'classes-sidebar',
             items: [{
                 bodyCls: 'classes-menu-item',
-                html: '<a href="../action/dashboard">Dashboard</a>'
+                html: '<a href="/service/dashboard">Dashboard</a>'
             }, {
                 bodyCls: 'classes-menu-item',
                 html: '<a href="#">CS 111</a>'

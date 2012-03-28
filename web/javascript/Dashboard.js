@@ -1,25 +1,16 @@
-Ext.define("CM.Dashboard", {
-    extend: "Ext.panel.Panel",
-
-    initComponent: function() {
-        Ext.apply(this, {
-            border: false,
-            height: '100%',
-            layout: {
-                type: 'hbox',
-                align: 'stretch'
-            },
-            items: [{
-                border: false,
-                html: 'class schedule panel',
-                flex: 1
-            }, {
-                border: false,
-                html: 'calendar panel',
-                flex: 3
-            }]
-        });
-
-        this.callParent(arguments);
+Ext.onReady(function() {
+    PageGlobals = {
+        headerPanel:  new CM.HeaderPanel({  region: 'north'  }),
+        sidebarPanel: new CM.SidebarPanel({ region: 'west'   }),
+        contentPanel: new CM.ContentPanel({ region: 'center' })
     }
+
+    Ext.create('Ext.container.Viewport', {
+        layout: 'border',
+        items: [
+            PageGlobals.headerPanel,
+            PageGlobals.sidebarPanel,
+            PageGlobals.contentPanel
+        ]
+    });
 });

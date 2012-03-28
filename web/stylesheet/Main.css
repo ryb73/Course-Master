@@ -1,31 +1,27 @@
 .page-header {
-  background: #000;
-  border: 0;
-  color: #FC0;
-  padding: 15px;
+    background: #000;
+    border: 0;
+    color: #FC0;
+    padding: 15px;
 }
 
 .page-header.title {
-  font-weight: bold;
-  font-size: 2em;
-  padding: 10px;
+    font-weight: bold;
+    font-size: 2em;
+    padding: 10px;
 }
 
-.classes-sidebar {
-  padding: 10px
+.sidebar {
+    background: #FC0;
+}
+.sidebar-class {
+    background: #000;
+    border: 1px solid #000;
+    border-collapse: collapse;
 }
 
-.classes-menu-item {
-	border: 0
-}
-
-.classes-menu-item a, .classes-menu-item a:visited {
-	color: #009;
-	text-decoration: none;
-	font-size: 1.5em
-}
-
-.classes-menu-item li a, .classes-menu-item li a:visited {
-	font-size: 1em;
-	margin-left: 5px
+div.sidebar-class * span {
+    color: #FC0 !important;
+    font-size: 14px !important;
+    font-style: italic;
 }

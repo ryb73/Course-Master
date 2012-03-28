@@ -1,14 +1,12 @@
-Ext.define("CM.DetailPanel", {
+Ext.define("CM.Class.Home", {
     extend: "Ext.panel.Panel",
 
     initComponent: function() {
+
         Ext.apply(this, {
             border: false,
-            height: '100%',
-            layout: 'card',
-            items: [
-                new CM.Dashboard()
-            ]
+            id: this.initialConfig.class + "-class",
+            html: "Root panel for " + this.initialConfig.class
         });
 
         this.callParent(arguments);

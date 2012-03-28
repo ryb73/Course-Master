@@ -9,10 +9,12 @@
         <script type="text/javascript" src="/3rdparty/extjs/ext-all-debug.js"></script>
 
         <link rel="stylesheet" type="text/css" href="/stylesheet/Main.css" />
-        <script type="text/javascript" src="/javascript/Viewport.js"></script>
-        <script type="text/javascript" src="/javascript/Header.js"></script>
-        <script type="text/javascript" src="/javascript/Main.js"></script>
+        <script type="text/javascript" src="/javascript/ClassHome.js"></script>
+        <script type="text/javascript" src="/javascript/Content.js"></script>
         <script type="text/javascript" src="/javascript/Dashboard.js"></script>
+        <script type="text/javascript" src="/javascript/Header.js"></script>
+        <script type="text/javascript" src="/javascript/Sidebar.js"></script>
+        <script type="text/javascript" src="/javascript/SidebarPanel.js"></script>
     </head>
     <body>
          <script type="text/javascript">
