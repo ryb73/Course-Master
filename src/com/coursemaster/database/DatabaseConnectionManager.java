@@ -30,14 +30,12 @@ public abstract class DatabaseConnectionManager {
         }
         else {
             logger.fatal("Unrecognized database connector");
-            System.exit(0);
         }
 
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
             logger.fatal("Unable to load database driver class: " + driver);
-            System.exit(0);
         }
 
         username = _username;
@@ -49,7 +47,6 @@ public abstract class DatabaseConnectionManager {
         }
         catch (SQLException e) {
             logger.fatal("Unable to create session with database:\n" + e.getMessage());
-            System.exit(0);
         }
     }
 

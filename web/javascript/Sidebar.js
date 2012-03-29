@@ -6,24 +6,23 @@ Ext.define("CM.SidebarPanel", {
         Ext.apply(this, {
             border: false,
             layout: {
-                type: 'vbox',
-                align: 'stretch'
+                type: 'accordion',
+                titleCollapse: true,
+                animate: true,
+                fill: false,
+                padding: '5 0 0'
             },
-            padding: '15',
+            padding: 15,
             bodyCls: 'sidebar',
             cls: 'sidebar',
             width: 200,
-            items: [ new CM.Sidebar.Class({
-                class: 'Dashboard'
-            }), new CM.Sidebar.Class({
-                class: 'CS 111'
-            }), new CM.Sidebar.Class({
-                class: 'CS 201'
-            }), new CM.Sidebar.Class({
-                class: 'Math 231'
-            }), new CM.Sidebar.Class({
-                class: 'Ling 100'
-            })]
+            items: [ 
+                new CM.Sidebar.Class({ class: 'Dashboard' }),
+                new CM.Sidebar.Class({ class: 'CS 111'    }),
+                new CM.Sidebar.Class({ class: 'CS 201'    }),
+                new CM.Sidebar.Class({ class: 'Math 231'  }),
+                new CM.Sidebar.Class({ class: 'Ling 100'  })
+            ]
         });
 
         this.callParent(arguments);

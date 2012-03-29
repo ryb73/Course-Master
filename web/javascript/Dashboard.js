@@ -4,7 +4,7 @@ Ext.onReady(function() {
         contentPanel: new CM.ContentPanel({ region: 'center' })
     };
 
-    PageGlobals.sidebarPanel = new CM.SidebarPanel({ region: 'west'   });
+    PageGlobals.sidebarPanel = new CM.SidebarPanel({ region: 'west' });
 
     Ext.create('Ext.container.Viewport', {
         layout: 'border',
