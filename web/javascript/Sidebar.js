@@ -6,16 +6,14 @@ Ext.define("CM.SidebarPanel", {
         Ext.apply(this, {
             border: false,
             layout: {
-                type: 'accordion',
-                titleCollapse: true,
-                animate: true,
-                fill: false,
-                padding: '5 0 0'
+                type: 'vbox',
+                align: 'stretch'
             },
             padding: 15,
             bodyCls: 'sidebar',
             cls: 'sidebar',
             width: 200,
+            height: 200,
             items: [ 
                 new CM.Sidebar.Class({ class: 'Dashboard' }),
                 new CM.Sidebar.Class({ class: 'CS 111'    }),

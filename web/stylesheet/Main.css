@@ -14,14 +14,15 @@
 .sidebar {
     background: #FC0;
 }
+
 .sidebar-class {
     background: #000;
-    border: 1px solid #000;
-    border-collapse: collapse;
+    border: 1px solid #000 !important;
 }
 
-div.sidebar-class * span {
+.sidebar-class * span {
     color: #FC0 !important;
     font-size: 14px !important;
     font-style: italic;
+    cursor: pointer;
 }

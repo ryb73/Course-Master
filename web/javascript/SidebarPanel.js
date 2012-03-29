@@ -1,26 +1,32 @@
 Ext.define("CM.Sidebar.Class", {
-    extend: "Ext.panel.Panel",
+    extend: "Ext.button.Button",
 
     initComponent: function() {
 
         Ext.apply(this, {
-            title: this.class,
-            cls: 'sidebar',
+            text: this.class,
+            cls: 'sidebar-class',
             border: false,
-            margin: 15,
+            height: 25,
+            margin: '0 0 5',
             itemId: this.class + '-link',
-            html: "root<br/>discussion<br/>forum"
+            handler: this.expandFunction,
+            //html: "root<br/>discussion<br/>forum",
+            //listeners: {
+            //    expand: this.expandFunction,
+            //    beforeCollapse: this.collapseFunction
+            //}
         });
 
         this.callParent(arguments);
     },
 
-    clickFunction: function(button, evt) {
+    expandFunction: function(btn, evt) {
 
-        if (!PageGlobals.contentPanel.getChildByElement(button.text + "-class")) {
-            PageGlobals.contentPanel.add(new CM.Class.Home({ class: button.text }));
+        if (!PageGlobals.contentPanel.getChildByElement(btn.text + "-class")) {
+            PageGlobals.contentPanel.add(new CM.Class.Home({ class: btn.text }));
         }
 
-        PageGlobals.contentPanel.getLayout().setActiveItem(button.text + '-class');
+        PageGlobals.contentPanel.getLayout().setActiveItem(btn.text + '-class');
     }
 });
