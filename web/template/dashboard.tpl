@@ -9,12 +9,15 @@
         <script type="text/javascript" src="/3rdparty/extjs/ext-all-debug.js"></script>
 
         <link rel="stylesheet" type="text/css" href="/stylesheet/Main.css" />
-        <script type="text/javascript" src="/javascript/ClassHome.js"></script>
-        <script type="text/javascript" src="/javascript/Content.js"></script>
-        <script type="text/javascript" src="/javascript/Dashboard.js"></script>
-        <script type="text/javascript" src="/javascript/Header.js"></script>
-        <script type="text/javascript" src="/javascript/Sidebar.js"></script>
-        <script type="text/javascript" src="/javascript/SidebarPanel.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Home.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Discussion/Root.js"></script>
+
+        <script type="text/javascript" src="/javascript/Global/Content.js"></script>
+        <script type="text/javascript" src="/javascript/Global/Dashboard.js"></script>
+        <script type="text/javascript" src="/javascript/Global/Header.js"></script>
+
+        <script type="text/javascript" src="/javascript/Sidebar/Button.js"></script>
+        <script type="text/javascript" src="/javascript/Sidebar/Root.js"></script>
     </head>
     <body>
          <script type="text/javascript">

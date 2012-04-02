@@ -5,6 +5,7 @@ Ext.define("CM.ContentPanel", {
 
         Ext.apply(this, {
             layout: "card",
+            border: false,
             items: [ new CM.Class.Home({ class: "Dashboard" }) ]
         });
 
