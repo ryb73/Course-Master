@@ -1,18 +1,13 @@
-Ext.define('CM.Discussion.Board.Model', {
-    extend: 'Ext.data.Model',
-    fields: [ 'name', 'postCount' ]
-});
-
 Ext.define('CM.Discussion.Root', {
     extend: 'Ext.grid.Panel',
 
     initComponent: function() {
 
         var discussionBoards = Ext.create('Ext.data.Store', {
-            model: 'CM.Discussion.Board.Model',
+            fields: [ 'name', 'postCount', 'id' ],
             data: [
-                { name: '<a href="#board=1">Board 1</a>', postCount: 12 },
-                { name: '<a href="#board=2">Board 2</a>', postCount: 3 }
+                { id: '1', name: 'Board 1', postCount: 12 },
+                { id: '2', name: 'Board 2', postCount: 3 }
             ]
         });
 
@@ -21,17 +16,33 @@ Ext.define('CM.Discussion.Root', {
             store: discussionBoards,
             id: this.class + '-board-root',
             title: this.class + ' Discussion Board',
-            columns: [{
-                text: 'Name',
-                width: 700,
-                dataIndex: 'name'
-            }, {
-                text: 'Posts',
-                flex: 1,
-                dataIndex: 'postCount'
-            }]
+            listeners: {
+                select: this.onSelect
+            },
+            columns: {
+                items: [{
+                    text: 'Board Name',
+                    flex: 1,
+                    dataIndex: 'name'
+                }, {
+                    text: 'Posts',
+                    width: 40,
+                    align: 'right',
+                    dataIndex: 'postCount'
+                }],
+                defaults: {
+                    draggable: false,
+                    resizable: false,
+                    hideable: false,
+                    sortable: false
+                }
+            }
         });
 
         this.callParent(arguments);
+    },
+
+    onSelect: function(rowModel, record) {
+        console.log("Select fired: " + record.get("id"));
     }
 });

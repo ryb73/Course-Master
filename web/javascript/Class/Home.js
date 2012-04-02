@@ -9,7 +9,7 @@ Ext.define("CM.Class.Home", {
             title: this.class,
             items: [{
                 border: false,
-                html: "Root panel for " + this.initialConfig.class
+                html: "Root panel for " + this.class
             }, {
                 xtype: 'button',
                 text: 'Discussion Board',
