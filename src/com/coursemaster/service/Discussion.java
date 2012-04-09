@@ -2,10 +2,9 @@ package com.coursemaster.service;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,15 +44,14 @@ public class Discussion extends AbstractService {
 
         try {
             Connection dbConnection = DatabaseConnectionManager.getConnection();
-            Statement statement = dbConnection.createStatement();
 
             // TODO: validate input. and maybe not hard code things
-            String sqlStatement = String.format("insert into discussion_board (course, name, status) values (%d, '%s', %d)",
-                    Integer.parseInt(request.getParameter("course")), request.getParameter("boardName"),
-                    Integer.parseInt(request.getParameter("status")));
-            logger.debug(sqlStatement);
+            PreparedStatement statement = dbConnection.prepareStatement("insert into discussion_board (course, name, status) values (?, ?, ?)");
+            statement.setInt(1, Integer.parseInt(request.getParameter("course")));
+            statement.setString(2, request.getParameter("boardName"));
+            statement.setInt(3, Integer.parseInt(request.getParameter("status")));
 
-            statement.execute(sqlStatement);
+            statement.execute();
 
             response.setStatus(HttpServletResponse.SC_OK); // OK
             response.setContentType("application/json");
@@ -84,16 +82,15 @@ public class Discussion extends AbstractService {
     private void getBoards(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             Connection connection = DatabaseConnectionManager.getConnection();
-            Statement statement = connection.createStatement();
 
-            String sqlStatement = String.format(
+            PreparedStatement statement = connection.prepareStatement(
                     "select board.id, board.name, count(topic.id) topics " +
                     "from discussion_board board " +
                     "left join discussion_topic topic on topic.board = board.id " +
-                    "where board.course = %d " +
-                    "group by board.id, board.name",
-                    Integer.parseInt(request.getParameter("courseId")));
-            statement.execute(sqlStatement);
+                    "where board.course = ? " +
+                    "group by board.id, board.name");
+            statement.setInt(1, Integer.parseInt(request.getParameter("courseId")));
+            statement.execute();
 
             StringBuilder jsonResult = new StringBuilder("{ status: 'OK', boards:[");
             ResultSet resultSet = statement.getResultSet();

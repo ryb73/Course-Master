@@ -4,7 +4,7 @@ Ext.define('CM.Discussion.Root', {
     initComponent: function() {
 
         var discussionBoards = Ext.create('Ext.data.Store', {
-            fields: [ 'name', 'postCount', 'id' ],
+            fields: [ 'name', 'topicCount', 'id' ],
             /*data: [
                 { id: '1', name: 'Board 1', postCount: 12 },
                 { id: '2', name: 'Board 2', postCount: 3 }
@@ -63,6 +63,7 @@ Ext.define('CM.Discussion.Root', {
                         {
                             xtype: 'button',
                             text: 'Add Board',
+                            instance: this,
                             listeners: { click: this.addBoard }
                         }
                     ]
@@ -134,7 +135,7 @@ Ext.define('CM.Discussion.Root', {
                     },{
                         xtype: 'hidden',
                         name: 'course',
-                        value: this.courseId
+                        value: this.instance.courseId
                     }
                 ],
 
