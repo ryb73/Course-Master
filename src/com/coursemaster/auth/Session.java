@@ -6,7 +6,18 @@ package com.coursemaster.auth;
  * @author Graham
  */
 public class Session {
-    public enum Role { ADMIN, PROFESSOR, STUDENT };
+    public enum Role {
+        ADMIN(3), PROFESSOR(2), STUDENT(1);
+    
+        private int value;
+        private Role(int v) {
+            value = v;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    };
 
     /**
      * Primary constructor

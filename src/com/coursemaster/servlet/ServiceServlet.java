@@ -37,7 +37,7 @@ public class ServiceServlet extends HttpServlet {
         if (function.equals("dashboard")) {
             new Dashboard().doRequest(request, response);
         }
-        else if(function.equals("discussion")) {
+        else if(function.startsWith("discussion")) {
             new Discussion().doRequest(request, response);
         }
         else if (function.equals("courses")) {
@@ -55,8 +55,11 @@ public class ServiceServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info(request.getMethod() + " " + request.getRequestURI());
 
-        response.setContentType("text/html");
-        response.getWriter().println("Service servlet responding to POST request");
+        String requestType = request.getRequestURI().substring(9).toLowerCase();
+
+        if (requestType.startsWith("discussion")) {
+        	new Discussion().doRequest(request, response);
+        }
     }
 
     private static final long serialVersionUID = 1L;

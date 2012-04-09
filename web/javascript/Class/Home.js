@@ -14,19 +14,32 @@ Ext.define("CM.Class.Home", {
                 xtype: 'button',
                 text: 'Discussion Board',
                 class: this.class,
-                handler: this.loadBoard
+                handler: this.loadBoard,
+                instance: this
             }]
         });
 
         this.callParent(arguments);
     },
+    
+    constructor: function(opt) {
+        this.callParent(arguments);
+
+        if(opt.courseId) {
+            this.courseId = opt.courseId;
+        }
+
+        return this;
+    },
 
     loadBoard: function(btn, evt) {
 
         if (!PageGlobals.contentPanel.getChildByElement(btn.class + "-board-root")) {
-            PageGlobals.contentPanel.add(new CM.Discussion.Root({ class: btn.class }));
+            PageGlobals.contentPanel.add(new CM.Discussion.Root({ class: btn.class, courseId: btn.instance.courseId }));
         }
 
         PageGlobals.contentPanel.getLayout().setActiveItem(btn.class + '-board-root');
-    }
+    },
+
+    courseId: -1
 });
