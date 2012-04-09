@@ -1,9 +1,6 @@
 package com.coursemaster.servlet;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -86,15 +83,9 @@ public class ActionServlet extends HttpServlet {
 
         String encryptedPassword = AuthenticationManager.authenticator.getHashedPassword(email, password);
 
-        try {
-            Connection conn = DatabaseConnectionManager.getConnection();
-            Statement  stmt = conn.createStatement();
-            stmt.execute("update user set password = '" + encryptedPassword + "' where email = '" + email + "';");
-        } catch (SQLException e) {
-            logger.error("Unable to run sql update. Error follows:\n" + e.getMessage());
-        }
+        int updated = DatabaseConnectionManager.executeUpdate("update user set password = '" + encryptedPassword + "' where email = '" + email + "';");
 
-        response.getWriter().write("Password successfully updated.");
+        response.getWriter().write((updated < 1 ? "Failed to update " : "Successfully updated ") + "password for " + email);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 

@@ -2,10 +2,16 @@ package com.coursemaster.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 public abstract class DatabaseConnectionManager {
     private static String connectionString;
@@ -56,8 +62,83 @@ public abstract class DatabaseConnectionManager {
      * @return A connection object
      * @throws SQLException If the connection cannot be created
      */
-    public static Connection getConnection() throws SQLException {
+    private static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(connectionString, username, password);
+    }
+
+    public static int executeUpdate(String sqlUpdate) {
+        int res = 0;
+
+        try {
+            Connection conn = getConnection();
+            Statement stmt  = conn.createStatement();
+            res = stmt.executeUpdate(sqlUpdate);
+        }
+        catch (SQLException e) {
+            logger.error("An exception occured while trying to execute an update:\n" + e.getMessage());
+            res = -1;
+        }
+
+        return res;
+    }
+
+    /**
+     * Executes a query and returns the results
+     * in JSON form, {count:(total number of elements in sql query result set), data: [{(query objects)}]}
+     * @param sqlQuery The query to execute
+     * @return The result set
+     */
+    public static JSONObject executeQuery(String sqlQuery) {
+        return executeQuery(sqlQuery, 0, Integer.MAX_VALUE);
+    }
+
+
+    /**
+     * Executes a query and returns a limited set of results
+     * in JSON form, {count:(total number of elements in sql query result set), data: [{(query objects)}]}
+     * @param sqlQuery The query to execute
+     * @return The result set
+     */
+    public static JSONObject executeQuery(String sqlQuery, int start, int limit) {
+        JSONObject rsp = new JSONObject();
+        Vector<Map<String, Object>> data = new Vector<Map<String,Object>>();
+        int count = 0;
+
+        //Remove unnecessary recalculations
+        limit = limit + start;
+
+        try {
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet res  = stmt.executeQuery(sqlQuery);
+
+            ResultSetMetaData rsmd = res.getMetaData();
+            int numColumns = rsmd.getColumnCount();
+    
+            // Move to starting row
+            while (res.next()) {
+                if (count >= start && count < limit) {
+                    Map<String, Object> row = new HashMap<String, Object>();
+                    for (int i = 1; i <= numColumns; i++) {
+                        row.put(rsmd.getColumnName(i), res.getObject(i));
+                    }
+                    data.add(row);
+                }
+                ++count;
+            }
+    
+            // Set the row count
+            rsp.put("count", count);
+            rsp.put("data", data);
+
+            conn.close();
+        }
+        catch (Exception e) {
+            logger.error("An exception was thrown while processing a query: " + e.getMessage());
+            return null;
+        }
+
+        return rsp;
     }
 
     /**

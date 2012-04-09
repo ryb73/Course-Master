@@ -1,35 +1,36 @@
 package com.coursemaster.auth;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.HashMap;
 
 import javax.servlet.http.Cookie;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.coursemaster.database.DatabaseConnectionManager;
 
 public class DatabaseAuthenticator extends Authenticator {
 
+    @SuppressWarnings("unchecked")
     @Override
     public Cookie login(String email, String password) {
         String encryptedPassword = getHashedPassword(email, password);
-        ResultSet res;
 
         try {
-            Connection conn = DatabaseConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            res = stmt.executeQuery("select * from user where email = '" + email + "';");
+            JSONObject rsp = DatabaseConnectionManager.executeQuery("select * from user where email = '" + email + "'");
+            HashMap<String, Object> data;
 
-            // Email not found
-            if (res == null || !res.first()) { return null; }
+            // Response count if email wasn't located (user not found)
+            if (rsp.getInt("count") > 0 && (data = ((HashMap<String, Object>) ((JSONArray) rsp.get("data")).get(0))) != null) {
+                String storedPassword = (String) data.remove("password");
 
-            String storedPassword = res.getString("password");
-
-            if (encryptedPassword.equals(storedPassword)) {
-                return generateSession(res.getLong("id"), res.getString("fullname"), email, Session.roleForInt(res.getInt("role")));
+                // Check password matches
+                if (encryptedPassword.equals(storedPassword)) {
+                    return generateSession(((Integer) data.get("id")).longValue(), (String) data.get("fullname"), email, Session.roleForInt((Integer) data.get("role")));
+                }
             }
-        } catch (SQLException e) {
+        } catch (JSONException e) {
             logger.error("Unable to establish connection with database:\n" + e.getMessage());
         }
 
