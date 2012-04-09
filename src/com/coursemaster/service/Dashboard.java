@@ -19,7 +19,9 @@ public class Dashboard extends AbstractService {
         Session session = (Session) request.getAttribute("session");
 
         // Replace dashboard content with specified user's content
-        dashboardAsString = dashboardAsString.replace("##USERNAME##", session.getUsername());
+        dashboardAsString = dashboardAsString.replace("##ID##", "" + session.getId());
+        dashboardAsString = dashboardAsString.replace("##NAME##", session.getName());
+        dashboardAsString = dashboardAsString.replace("##EMAIL##", session.getEmail());
 
         response.getWriter().write(dashboardAsString);
         response.setStatus(HttpServletResponse.SC_OK);

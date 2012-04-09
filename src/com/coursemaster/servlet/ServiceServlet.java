@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import com.coursemaster.service.Courses;
 import com.coursemaster.service.Dashboard;
 import com.coursemaster.service.Discussion;
 
@@ -38,6 +39,9 @@ public class ServiceServlet extends HttpServlet {
         }
         else if(function.equals("discussion")) {
             new Discussion().doRequest(request, response);
+        }
+        else if (function.equals("courses")) {
+            new Courses().doRequest(request, response);
         }
     }
 

@@ -1,6 +1,9 @@
 package com.coursemaster.servlet;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -10,6 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import com.coursemaster.auth.AuthenticationManager;
+import com.coursemaster.auth.Session;
+import com.coursemaster.database.DatabaseConnectionManager;
 import com.coursemaster.server.Settings;
 
 /**
@@ -30,7 +36,14 @@ public class ActionServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info(request.getMethod() + " " + request.getRequestURI());
 
-        //String function = request.getRequestURI().substring(8).toLowerCase();
+        String function = request.getRequestURI().substring(8).toLowerCase();
+
+        if (function.equals("logout")) {
+            doLogout(request, response);
+        }
+        else if (function.equals("update-user")) {
+            doUserUpdate(request, response);
+        }
     }
 
     /**
@@ -47,6 +60,66 @@ public class ActionServlet extends HttpServlet {
         if (function.equals("login")) {
             doLogin(request, response);
         }
+        else if (function.equals("add-user")) {
+            // Add user
+        }
+        else if (function.equals("update-user")) {
+            doUserUpdate(request, response);
+        }
+    }
+
+    /**
+     * Method to update a user
+     *
+     * @param request The HTTP Request
+     * @param resposne The HTTP Response
+     */
+    private void doUserUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+
+        if (email == null || email.equals("")) {
+            response.getWriter().write("No user specified");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        String encryptedPassword = AuthenticationManager.authenticator.getHashedPassword(email, password);
+
+        try {
+            Connection conn = DatabaseConnectionManager.getConnection();
+            Statement  stmt = conn.createStatement();
+            stmt.execute("update user set password = '" + encryptedPassword + "' where email = '" + email + "';");
+        } catch (SQLException e) {
+            logger.error("Unable to run sql update. Error follows:\n" + e.getMessage());
+        }
+
+        response.getWriter().write("Password successfully updated.");
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    /**
+     * Method to log a user out
+     *
+     * @param request The HTTP Request
+     * @param response The HTTP Response
+     */
+    private void doLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Session session = (Session) request.getAttribute("session");
+        logger.trace("Destroying session for user: " + session.getName());
+        AuthenticationManager.authenticator.logout(session);
+
+        // Kill the cookie
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals(Settings.cookieName)) {
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+            }
+        }
+
+        response.sendRedirect("/login.html");
+        response.addHeader("AUTHENTICATION", "Successfully logged out");
+        response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
     }
 
     /**
@@ -56,10 +129,10 @@ public class ActionServlet extends HttpServlet {
      * @param response The HTTP Response
      */
     private void doLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String username = request.getParameter("username"),
+        String email = request.getParameter("email"),
                password = request.getParameter("password");
 
-        if (username == null || username == "" ||
+        if (email == null || email == "" ||
             password == null || password == "") {
             response.addHeader("Location", "/login.html");
             response.addHeader("FAILURE-REASON", "Both username and password are required to login");
@@ -67,7 +140,8 @@ public class ActionServlet extends HttpServlet {
             return;
         }
 
-        Cookie sessionCookie = Settings.authenticator.login(username, password);
+        logger.trace("Attempting to create session for user: " + email);
+        Cookie sessionCookie = AuthenticationManager.authenticator.login(email, password);
 
         if (sessionCookie == null) {
             response.addHeader("Location", "/login.html");
@@ -77,8 +151,8 @@ public class ActionServlet extends HttpServlet {
         }
 
         response.addCookie(sessionCookie);
+        response.addHeader("AUTHENTICATION", "OK");
         response.sendRedirect("/service/dashboard");
-        response.setContentLength(0);
     }
 
     private static final long serialVersionUID = 1L;

@@ -35,7 +35,6 @@ public class ResourceServlet extends HttpServlet {
         resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(false);
         resourceHandler.setCacheControl("no-store,no-cache,must-revalidate");
-        resourceHandler.setWelcomeFiles(new String[]{ "dashboard.html" });
         resourceHandler.setResourceBase(Settings.courseMasterDirectory + "/web");
     }
 

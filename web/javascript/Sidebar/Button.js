@@ -1,8 +1,7 @@
-Ext.define("CM.Sidebar.Class", {
+Ext.define("CM.Sidebar.Button", {
     extend: "Ext.button.Button",
 
     initComponent: function() {
-
         Ext.apply(this, {
             text: this.class,
             cls: 'sidebar-class',
