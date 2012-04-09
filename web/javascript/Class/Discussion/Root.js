@@ -17,7 +17,8 @@ Ext.define('CM.Discussion.Root', {
             id: this.class + '-board-root',
             title: this.class + ' Discussion Board',
             listeners: {
-                select: this.onSelect
+                select: this.onSelect,
+                itemdblclick: this.onItemDblClick
             },
             columns: {
                 items: [{
@@ -36,7 +37,19 @@ Ext.define('CM.Discussion.Root', {
                     hideable: false,
                     sortable: false
                 }
-            }
+            },
+            dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                items: [
+                    {
+                        xtype: 'button',
+                        text: 'Add Board',
+                        listeners: { click: this.addBoard }
+                    }
+                ]
+            }]
         });
 
         this.callParent(arguments);
@@ -44,5 +57,74 @@ Ext.define('CM.Discussion.Root', {
 
     onSelect: function(rowModel, record) {
         console.log("Select fired: " + record.get("id"));
+    },
+    
+    onItemDblClick: function(view, record) {
+        console.log("Double clicked: " + record.get("id"));
+    },
+
+    addBoard: function() {
+        var statusOptions = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name'],
+            data: [
+                { 'id': '1', 'name': 'Open' }
+            ]
+        });
+
+        Ext.create('widget.window', {
+            title: 'Add Discussion Board',
+            closable: true,
+            width: 300,
+            height: 150,
+            layout: 'fit',
+            items: {
+                xtype: 'form',
+                url: '/service/discussion/create-board',
+
+                layout: {
+                    type: 'vbox',
+                    align: 'center',
+                    pack: 'center'
+                },
+
+                items: [
+                    {
+                        xtype: 'textfield',
+                        name: 'boardName',
+                        fieldLabel: 'Board Name',
+                        allowBlank: false
+                    },{
+                        xtype: 'combobox',
+                        name: 'status',
+                        fieldLabel: 'Status',
+                        editable: false,
+                        allowBlank: false,
+                        store: statusOptions,
+                        queryMode: 'local',
+                        displayField: 'name',
+                        valueField: 'id'
+                    },{
+                        xtype: 'hidden',
+                        name: 'course',
+                        value: '1'
+                    }
+                ],
+
+                buttons: [{
+                    text: 'Create Board',
+                    formBind: true,
+                    disabled: true,
+                    handler: function() {
+                        var form = this.up('form').getForm();
+                        if(form.isValid()) {
+                            form.submit({
+                                success: function() { Ext.Msg.alert("success","success"); },
+                                failure: function() { Ext.Msg.alert("failure","failure"); }
+                            });
+                        }
+                    }
+                }]
+            }
+        }).show();
     }
 });
