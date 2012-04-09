@@ -5,10 +5,23 @@ Ext.define('CM.Discussion.Root', {
 
         var discussionBoards = Ext.create('Ext.data.Store', {
             fields: [ 'name', 'postCount', 'id' ],
-            data: [
+            /*data: [
                 { id: '1', name: 'Board 1', postCount: 12 },
                 { id: '2', name: 'Board 2', postCount: 3 }
-            ]
+            ]*/
+            proxy: {
+                type: 'ajax',
+                url: '/service/discussion/get-boards',
+                extraParams: {
+                    userId: SessionGlobals.id,
+                    courseId: this.courseId
+                },
+                reader: {
+                    type: 'json',
+                    root: 'boards'
+                }
+            },
+            autoLoad: true
         });
 
         Ext.apply(this, {
@@ -26,10 +39,10 @@ Ext.define('CM.Discussion.Root', {
                     flex: 1,
                     dataIndex: 'name'
                 }, {
-                    text: 'Posts',
+                    text: 'Topics',
                     width: 40,
                     align: 'right',
-                    dataIndex: 'postCount'
+                    dataIndex: 'topicCount'
                 }],
                 defaults: {
                     draggable: false,
@@ -37,22 +50,37 @@ Ext.define('CM.Discussion.Root', {
                     hideable: false,
                     sortable: false
                 }
-            },
-            dockedItems: [{
-                xtype: 'toolbar',
-                dock: 'bottom',
-                ui: 'footer',
-                items: [
-                    {
-                        xtype: 'button',
-                        text: 'Add Board',
-                        listeners: { click: this.addBoard }
-                    }
-                ]
-            }]
+            }
         });
 
+        if(SessionGlobals.role == 2) {
+            Ext.apply(this, {
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'bottom',
+                    ui: 'footer',
+                    items: [
+                        {
+                            xtype: 'button',
+                            text: 'Add Board',
+                            listeners: { click: this.addBoard }
+                        }
+                    ]
+                }]
+            });
+        }
+
         this.callParent(arguments);
+    },
+
+    constructor: function(opt) {
+        this.callParent(arguments);
+
+        if(opt.courseId) {
+            this.courseId = opt.courseId;
+        }
+
+        return this;
     },
 
     onSelect: function(rowModel, record) {
@@ -106,7 +134,7 @@ Ext.define('CM.Discussion.Root', {
                     },{
                         xtype: 'hidden',
                         name: 'course',
-                        value: '1'
+                        value: this.courseId
                     }
                 ],
 
@@ -119,12 +147,14 @@ Ext.define('CM.Discussion.Root', {
                         if(form.isValid()) {
                             form.submit({
                                 success: function() { Ext.Msg.alert("success","success"); },
-                                failure: function() { Ext.Msg.alert("failure","failure"); }
+                                failure: function() { Ext.Msg.alert("Error","Unable to add discussion board."); }
                             });
                         }
                     }
                 }]
             }
         }).show();
-    }
+    },
+
+    courseId: -1
 });

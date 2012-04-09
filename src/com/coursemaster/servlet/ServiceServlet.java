@@ -37,7 +37,7 @@ public class ServiceServlet extends HttpServlet {
         if (function.equals("dashboard")) {
             new Dashboard().doRequest(request, response);
         }
-        else if(function.equals("discussion")) {
+        else if(function.startsWith("discussion")) {
             new Discussion().doRequest(request, response);
         }
         else if (function.equals("courses")) {

@@ -41,7 +41,7 @@ Ext.define("CM.Sidebar.Panel", {
 
     onLoad: function(store, records, success, operation, opts) {
         Ext.each(records, function(rec) {
-            this.add(new CM.Sidebar.Button({ class: rec.data.dept + '-' + rec.data.num }));
+            this.add(new CM.Sidebar.Button({ class: rec.data.dept + '-' + rec.data.num, courseId: rec.data.id }));
         }, this);
     }
 });

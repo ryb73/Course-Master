@@ -30,7 +30,8 @@
             var SessionGlobals = {
                 id: '##ID##',
                 name: '##NAME##',
-                email: '##EMAIL##'
+                email: '##EMAIL##',
+				role: '##ROLE##'
             }
         </script>
     </body>
