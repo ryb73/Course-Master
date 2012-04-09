@@ -5,11 +5,17 @@
         <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
 
         <!-- Ext JS Framework -->
-        <link rel="stylesheet" type="text/css" href="/3rdparty/extjs/resources/css/ext-all.css">
+        <link rel="stylesheet" type="text/css" href="/3rdparty/extjs/resources/css/ext-all.css" />
         <script type="text/javascript" src="/3rdparty/extjs/ext-all-debug.js"></script>
 
+        <!-- Extensible Calendar Framework -->
+        <link rel="stylesheet" type="text/css" href="/3rdparty/extensible/resources/css/extensible-all.css" />
+        <script type="text/javascript" src="/3rdparty/extensible/pkgs/extensible-all-debug.js"></script>
+
+        <!-- Course Master Files -->
         <link rel="stylesheet" type="text/css" href="/stylesheet/Main.css" />
         <script type="text/javascript" src="/javascript/Class/Home.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Dashboard.js"></script>
         <script type="text/javascript" src="/javascript/Class/Discussion/Root.js"></script>
 
         <script type="text/javascript" src="/javascript/Global/Content.js"></script>
@@ -17,12 +23,14 @@
         <script type="text/javascript" src="/javascript/Global/Header.js"></script>
 
         <script type="text/javascript" src="/javascript/Sidebar/Button.js"></script>
-        <script type="text/javascript" src="/javascript/Sidebar/Root.js"></script>
+        <script type="text/javascript" src="/javascript/Sidebar/Panel.js"></script>
     </head>
     <body>
          <script type="text/javascript">
             var SessionGlobals = {
-                username: '##USERNAME##'
+                id: '##ID##',
+                name: '##NAME##',
+                email: '##EMAIL##'
             }
         </script>
     </body>

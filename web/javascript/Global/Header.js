@@ -1,4 +1,4 @@
-Ext.define("CM.HeaderPanel", {
+Ext.define("CM.Header.Panel", {
     extend: "Ext.panel.Panel",
 
     initComponent: function() {
@@ -15,7 +15,7 @@ Ext.define("CM.HeaderPanel", {
                 bodyCls: 'page-header',
                 flex: 1,
                 style: 'text-align:right;',
-                html: '<div>Logged in as: ' + SessionGlobals.username + '</div>'
+                html: '<div>Logged in as: ' + SessionGlobals.name + '</div>'
             }]
         });
 

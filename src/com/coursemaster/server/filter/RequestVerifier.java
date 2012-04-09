@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import com.coursemaster.auth.AuthenticationManager;
 import com.coursemaster.server.Settings;
 
 /**
@@ -40,11 +41,22 @@ public class RequestVerifier implements Filter {
         HttpServletRequest  httpRequest  = (HttpServletRequest)  request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        String requestURI = httpRequest.getRequestURI();
+        boolean authenticated = containsCookie(httpRequest, httpResponse);
+
         // Users who request secure content without
         // a session are redirected to the login page
-        if (!isInsecureRequest(httpRequest.getRequestURI()) && !containsCookie(httpRequest, httpResponse)) {
+        if (!isInsecureRequest(requestURI) && !authenticated) {
             httpResponse.sendRedirect("/login.html");
             httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        // Send root requests to the dashboard,
+        // as well as login page requests for users
+        // who are already logged in.
+        if (requestURI.equals("/") || (requestURI.equals("/login.html") && authenticated)) {
+            httpResponse.sendRedirect("/service/dashboard");
             return;
         }
 
@@ -77,8 +89,8 @@ public class RequestVerifier implements Filter {
 
                 // If the cookie matches the server cookie, look
                 // for that cookie in the current list of sessions
-                if(Settings.authenticator.hasSession(cookie.getValue())) {
-                    request.setAttribute("session", Settings.authenticator.getSession(cookie.getValue()));
+                if(AuthenticationManager.authenticator.hasSession(cookie.getValue())) {
+                    request.setAttribute("session", AuthenticationManager.authenticator.getSession(cookie.getValue()));
                     return true;
                 }
             

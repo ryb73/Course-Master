@@ -6,8 +6,7 @@ import java.util.Properties;
 
 import org.apache.log4j.xml.DOMConfigurator;
 
-import com.coursemaster.auth.Authenticator;
-import com.coursemaster.auth.MockAuthenticator;
+import com.coursemaster.auth.AuthenticationManager;
 import com.coursemaster.database.DatabaseConnectionManager;
 
 /**
@@ -28,7 +27,6 @@ public class Settings {
     public static DatabaseConnectionManager dbManager;
 
     // Authentication Parts
-    public static Authenticator authenticator;
     public static String cookieName;
 
     /**
@@ -60,12 +58,7 @@ public class Settings {
             port = Integer.parseInt(configProperties.getProperty("port"));
 
             String authenticationMode = configProperties.getProperty("auth");
-            if (authenticationMode == null || authenticationMode.equals("Mock")) {
-                authenticator = new MockAuthenticator();
-            }
-            else {
-                throw new IllegalArgumentException("Invalid authentication type");
-            }
+            AuthenticationManager.init(authenticationMode);
 
             // Load the cookie name
             cookieName = configProperties.getProperty("cookie");
@@ -77,15 +70,7 @@ public class Settings {
             String dbpass = configProperties.getProperty("dbpass");
 
             String dbConnector = configProperties.getProperty("connector");
-            if (dbConnector == null) {
-                throw new IllegalArgumentException("Missing Database Connector");
-            }
-            else if(dbConnector.equalsIgnoreCase("mysql")) {
-                DatabaseConnectionManager.init(dbConnector, dbloc, cmdb, dbuser, dbpass);
-            }
-            else {
-                throw new IllegalArgumentException("Unrecognized Database Connector");
-            }
+            DatabaseConnectionManager.init(dbConnector, dbloc, cmdb, dbuser, dbpass);
         }
         catch(Exception e) {
             System.err.println("Failed to load configuration settings.");

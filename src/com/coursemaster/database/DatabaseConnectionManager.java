@@ -22,6 +22,7 @@ public abstract class DatabaseConnectionManager {
      */
     public static void init(String connector, String location, String dbname, String _username, String _password) {
         String driver = null;
+
         if (connector == null || connector.equalsIgnoreCase("mysql")) {
             logger.trace("MySQL Database Configuration specified");
 
