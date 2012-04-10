@@ -18,7 +18,7 @@ Ext.define('CM.Discussion.Root', {
                 },
                 reader: {
                     type: 'json',
-                    root: 'boards'
+                    root: 'data'
                 }
             },
             autoLoad: true
