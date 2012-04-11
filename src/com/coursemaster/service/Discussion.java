@@ -1,16 +1,11 @@
 package com.coursemaster.service;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.coursemaster.auth.Session;
@@ -84,15 +79,13 @@ public class Discussion extends AbstractService {
     private void getMain(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Open the template file
         String discussionAsString = FileUtil.loadTemplateFile("discussion.tpl");
-   
+
         Session session = (Session) request.getAttribute("session");
-   
+
         // Replace discussion board content with specified user's content
         discussionAsString = discussionAsString.replace("##USERNAME##", session.getName());
-   
+
         response.getWriter().write(discussionAsString);
         response.setStatus(HttpServletResponse.SC_OK);
     }
-    
-    private static Logger logger = Logger.getLogger(Discussion.class);
 }
