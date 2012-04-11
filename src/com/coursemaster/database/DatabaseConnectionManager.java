@@ -2,6 +2,7 @@ package com.coursemaster.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -62,7 +63,7 @@ public abstract class DatabaseConnectionManager {
      * @return A connection object
      * @throws SQLException If the connection cannot be created
      */
-    private static Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(connectionString, username, password);
     }
 
@@ -139,6 +140,17 @@ public abstract class DatabaseConnectionManager {
         }
 
         return rsp;
+    }
+    
+    public static void executeInsert(String sqlQuery) {
+        try {
+            Connection dbConnection = DatabaseConnectionManager.getConnection();
+    
+            Statement statement = dbConnection.createStatement();
+            statement.execute(sqlQuery);
+        } catch (SQLException e) {
+            logger.error("An exception was thrown while processing a query: " + e.getMessage());
+        }
     }
 
     /**
