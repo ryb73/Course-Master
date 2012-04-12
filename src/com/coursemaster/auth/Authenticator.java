@@ -29,8 +29,8 @@ public abstract class Authenticator {
      */
     public abstract Cookie login(String email, String password);
 
-    public void logout(Session session) {
-        sessions.remove(session);
+    public void logout(String sessionKey) {
+        sessions.remove(sessionKey);
     }
     /**
      * Internal method to construct a random key for the cookie

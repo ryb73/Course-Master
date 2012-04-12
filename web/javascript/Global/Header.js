@@ -9,13 +9,15 @@ Ext.define("CM.Header.Panel", {
             layout: 'hbox',
             items: [{
                 bodyCls: 'page-header title',
-                flex: 1,
+                height: 50,
+                flex: 2,
                 html: 'Course Master'
             }, {
                 bodyCls: 'page-header',
-                flex: 1,
-                style: 'text-align:right;',
-                html: '<div>Logged in as: ' + SessionGlobals.name + '</div>'
+                style: 'text-align:right',
+                height: 50,
+                width: 250,
+                html: 'Logged in as ' + SessionGlobals.name + ' | <a href="/action/logout">Logout</a>'
             }]
         });
 
