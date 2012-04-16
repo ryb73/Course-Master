@@ -74,20 +74,10 @@ Ext.define('CM.Discussion.Root', {
         this.callParent(arguments);
     },
 
-    constructor: function(opt) {
-        this.callParent(arguments);
-
-        if(opt.courseId) {
-            this.courseId = opt.courseId;
-        }
-
-        return this;
-    },
-
     onSelect: function(rowModel, record) {
         console.log("Select fired: " + record.get("id"));
     },
-    
+
     onItemDblClick: function(view, record) {
         console.log("Double clicked: " + record.get("id"));
     },
@@ -155,7 +145,5 @@ Ext.define('CM.Discussion.Root', {
                 }]
             }
         }).show();
-    },
-
-    courseId: -1
+    }
 });

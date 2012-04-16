@@ -15,6 +15,7 @@ import com.coursemaster.service.dashboard.Dashboard;
 import com.coursemaster.service.event.CreateEvent;
 import com.coursemaster.service.event.DestroyEvent;
 import com.coursemaster.service.event.GetAllEvents;
+import com.coursemaster.service.event.GetCourseEvents;
 import com.coursemaster.service.event.UpdateEvent;
 
 /**
@@ -43,6 +44,9 @@ public class ServiceServlet extends HttpServlet {
         }
         else if (function.equals("events/all")) {
             new GetAllEvents().doRequest(request, response);
+        }
+        else if (function.equals("events/course")) {
+            new GetCourseEvents().doRequest(request, response);
         }
         else if (function.startsWith("discussion")) {
             new Discussion().doRequest(request, response);
