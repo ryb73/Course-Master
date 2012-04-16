@@ -1,4 +1,4 @@
-package com.coursemaster.service;
+package com.coursemaster.service.dashboard;
 
 import java.io.IOException;
 
@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.coursemaster.auth.Session;
+import com.coursemaster.service.AbstractService;
 import com.coursemaster.servlet.util.FileUtil;
 
 public class Dashboard extends AbstractService {

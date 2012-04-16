@@ -1,34 +1,36 @@
-Ext.Loader.setConfig({
-    enabled: true,
-    disableCaching: false,
-    paths: {
-        "Extensible.example": "/3rdparty/extensible/examples"
-    }
-});
-Ext.require([
-    'Extensible.calendar.data.MemoryEventStore'
-]);
-
 Ext.define("CM.Class.Dashboard", {
-    extend: "Ext.panel.Panel",
+    extend: "Extensible.calendar.CalendarPanel",
 
     initComponent: function() {
-        var eventStore = Ext.create('Extensible.calendar.data.MemoryEventStore', {
-            data: Ext.create('Extensible.example.calendar.data.Events')
+        var eventStore = new Extensible.calendar.data.MemoryEventStore({
+            proxy: {
+                type: 'ajax',
+                url: '/service/events',
+                api: {
+                    create  : "events/create",
+                    read    : "events/all",
+                    update  : "events/update",
+                    destroy : "events/destroy"
+                },
+                reader: {
+                    type: 'json',
+                    root: 'data'
+                },
+                writer: new Ext.data.JsonWriter({
+                    root: 'data',
+                    encode: true,
+                    writeAllFields: true
+                })
+            },
+            autoLoad: true
         });
 
         Ext.apply(this, {
+            title: 'Dashboard',
             border: false,
             id: "Dashboard-class",
-            title: "Dashboard",
-            items: [
-                Ext.create('Extensible.calendar.CalendarPanel', {
-                    eventStore: eventStore,
-                    title: 'My Calendar',
-                    width: '100%',
-                    height: 600
-                })
-            ]
+            eventStore: eventStore,
+            border: false
         });
 
         this.callParent(arguments);

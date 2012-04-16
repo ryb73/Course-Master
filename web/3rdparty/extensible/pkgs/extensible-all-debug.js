@@ -565,28 +565,28 @@ Ext.ns('Extensible.calendar.data');
 
 Extensible.calendar.data.EventMappings = {
     EventId: {
-        name:    'EventId',
+        name:    'id',
         mapping: 'id',
         type:    'int'
     },
     CalendarId: {
-        name:    'CalendarId',
-        mapping: 'cid',
+        name:    'course',
+        mapping: 'course',
         type:    'int'
     },
     Title: {
-        name:    'Title',
-        mapping: 'title',
+        name:    'name',
+        mapping: 'name',
         type:    'string'
     },
     StartDate: {
-        name:       'StartDate',
+        name:       'start',
         mapping:    'start',
         type:       'date',
         dateFormat: 'c'
     },
     EndDate: {
-        name:       'EndDate',
+        name:       'end',
         mapping:    'end',
         type:       'date',
         dateFormat: 'c'
@@ -602,8 +602,8 @@ Extensible.calendar.data.EventMappings = {
         type:    'string'
     },
     Notes: {
-        name:    'Notes',
-        mapping: 'notes',
+        name:    'descr',
+        mapping: 'descr',
         type:    'string'
     },
     Url: {

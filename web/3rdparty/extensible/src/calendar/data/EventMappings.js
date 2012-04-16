@@ -95,12 +95,12 @@ Extensible.calendar.data.EventMappings = {
     },
     CalendarId: {
         name:    'CalendarId',
-        mapping: 'cid',
+        mapping: 'course',
         type:    'int'
     },
     Title: {
         name:    'Title',
-        mapping: 'title',
+        mapping: 'name',
         type:    'string'
     },
     StartDate: {
@@ -127,7 +127,7 @@ Extensible.calendar.data.EventMappings = {
     },
     Notes: {
         name:    'Notes',
-        mapping: 'notes',
+        mapping: 'descr',
         type:    'string'
     },
     Url: {
