@@ -5,10 +5,6 @@ Ext.define('CM.Discussion.Root', {
 
         var discussionBoards = Ext.create('Ext.data.Store', {
             fields: [ 'name', 'topicCount', 'id' ],
-            /*data: [
-                { id: '1', name: 'Board 1', postCount: 12 },
-                { id: '2', name: 'Board 2', postCount: 3 }
-            ]*/
             proxy: {
                 type: 'ajax',
                 url: '/service/discussion/get-boards',
