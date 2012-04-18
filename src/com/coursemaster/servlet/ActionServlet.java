@@ -98,12 +98,12 @@ public class ActionServlet extends HttpServlet {
     private void doLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Session session = (Session) request.getAttribute("session");
         logger.trace("Destroying session for user: " + session.getName());
-        AuthenticationManager.authenticator.logout(session);
 
         // Kill the cookie
         for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals(Settings.cookieName)) {
-                cookie.setMaxAge(0);
+                AuthenticationManager.authenticator.logout(cookie.getValue());
+                cookie.setMaxAge(-1);
                 response.addCookie(cookie);
             }
         }

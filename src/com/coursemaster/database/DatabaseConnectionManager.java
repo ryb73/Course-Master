@@ -2,7 +2,6 @@ package com.coursemaster.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -67,6 +66,11 @@ public abstract class DatabaseConnectionManager {
         return DriverManager.getConnection(connectionString, username, password);
     }
 
+    /**
+     * Executes an update operation
+     * @param sqlUpdate The update SQL String
+     * @return The number of rows affected
+     */
     public static int executeUpdate(String sqlUpdate) {
         int res = 0;
 
@@ -84,8 +88,50 @@ public abstract class DatabaseConnectionManager {
     }
 
     /**
+     * Executes an insert operation
+     * @param sqlInsert The insert SQL String
+     * @return The ID of the record, or -1 for failure
+     */
+    public static int executeInsert(String sqlInsert) {
+        try {
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            stmt.execute(sqlInsert);
+        } catch (SQLException e) {
+            logger.error("An exception was thrown while processing a query: " + e.getMessage());
+            return -1;
+        }
+
+        // TODO Return newly create ID
+        return 1;
+    }
+
+    /**
+     * Executes a delete operation
+     * @param sqlDelete The delete SQL String
+     * @return Whether the operation succeeded
+     */
+    public static boolean executeDelete(String sqlDelete) {
+        try {
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            stmt.execute(sqlDelete);
+        } catch (SQLException e) {
+            logger.error("An exception was thrown while processing a query: " + e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Executes a query and returns the results
-     * in JSON form, {count:(total number of elements in sql query result set), data: [{(query objects)}]}
+     * in JSON form,
+     *   {
+     *     status: 'OK|Failed',
+     *     count: # Records in Result Set,
+     *     data: [{(query objects)}]
+     *   }
      * @param sqlQuery The query to execute
      * @return The result set
      */
@@ -93,10 +139,14 @@ public abstract class DatabaseConnectionManager {
         return executeQuery(sqlQuery, 0, Integer.MAX_VALUE);
     }
 
-
     /**
      * Executes a query and returns a limited set of results
-     * in JSON form, {count:(total number of elements in sql query result set), data: [{(query objects)}]}
+     * in JSON form,
+     *   {
+     *     status: 'OK|Failed',
+     *     count:# Records in Result Set,
+     *     data: [{(query objects)}]
+     *   }
      * @param sqlQuery The query to execute
      * @return The result set
      */
@@ -115,7 +165,7 @@ public abstract class DatabaseConnectionManager {
 
             ResultSetMetaData rsmd = res.getMetaData();
             int numColumns = rsmd.getColumnCount();
-    
+
             // Move to starting row
             while (res.next()) {
                 if (count >= start && count < limit) {
@@ -127,10 +177,11 @@ public abstract class DatabaseConnectionManager {
                 }
                 ++count;
             }
-    
+
             // Set the row count
             rsp.put("count", count);
             rsp.put("data", data);
+            rsp.put("status", "OK");
 
             conn.close();
         }
@@ -140,17 +191,6 @@ public abstract class DatabaseConnectionManager {
         }
 
         return rsp;
-    }
-    
-    public static void executeInsert(String sqlQuery) {
-        try {
-            Connection dbConnection = DatabaseConnectionManager.getConnection();
-    
-            Statement statement = dbConnection.createStatement();
-            statement.execute(sqlQuery);
-        } catch (SQLException e) {
-            logger.error("An exception was thrown while processing a query: " + e.getMessage());
-        }
     }
 
     /**
@@ -214,8 +254,7 @@ public abstract class DatabaseConnectionManager {
         "owner  INT          NOT NULL," +
         "course INT," +
         "type   INT," +
-        "FOREIGN KEY (owner)  REFERENCES user(id)," +
-        "FOREIGN KEY (course) REFERENCES course(id));";
+        "FOREIGN KEY (owner) REFERENCES user(id));";
     private static final String FOLDER_TABLE_SCRIPT =
         "create table folder(" +
         "id     INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +

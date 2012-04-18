@@ -128,8 +128,7 @@ CREATE TABLE `event` (
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   KEY `course` (`course`),
-  CONSTRAINT `event_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`),
-  CONSTRAINT `event_ibfk_2` FOREIGN KEY (`course`) REFERENCES `course` (`id`)
+  CONSTRAINT `event_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

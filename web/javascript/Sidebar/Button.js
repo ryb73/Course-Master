@@ -14,25 +14,12 @@ Ext.define("CM.Sidebar.Button", {
 
         this.callParent(arguments);
     },
-    
-    constructor: function(opt) {
-        this.callParent(arguments);
-
-        if(opt.courseId) {
-            this.courseId = opt.courseId;
-        }
-
-        return this;
-    },
 
     loadClass: function(btn, evt) {
-
         if (!PageGlobals.contentPanel.getChildByElement(btn.text + "-class")) {
             PageGlobals.contentPanel.add(new CM.Class.Home({ class: btn.text, courseId: btn.courseId }));
         }
 
         PageGlobals.contentPanel.getLayout().setActiveItem(btn.text + '-class');
-    },
-
-    courseId: -1
+    }
 });
