@@ -20,6 +20,8 @@ import com.coursemaster.server.Settings;
  * It is primarily responsible for session management actions
  * such as logging users in and out
  *
+ * TODO Make this servlet more restful
+ *
  * @author Graham
  */
 public class ActionServlet extends HttpServlet {
@@ -57,8 +59,9 @@ public class ActionServlet extends HttpServlet {
         if (function.equals("login")) {
             doLogin(request, response);
         }
-        else if (function.equals("add-user")) {
-            // Add user
+        else if (function.equals("user/new") || function.equals("course/new")) {
+            // TODO Actually handle these requests
+            response.getWriter().write("{ success: true }");
         }
         else if (function.equals("update-user")) {
             doUserUpdate(request, response);

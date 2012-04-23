@@ -16,10 +16,12 @@ Ext.define("CM.Sidebar.Button", {
     },
 
     loadClass: function(btn, evt) {
-        if (!PageGlobals.contentPanel.getChildByElement(btn.text + "-class")) {
+        var elId = btn.text.replace(' ', '-').toLowerCase() + '-panel';
+
+        if (!PageGlobals.contentPanel.getChildByElement(elId)) {
             PageGlobals.contentPanel.add(new CM.Class.Home({ class: btn.text, courseId: btn.courseId }));
         }
 
-        PageGlobals.contentPanel.getLayout().setActiveItem(btn.text + '-class');
+        PageGlobals.contentPanel.getLayout().setActiveItem(elId);
     }
 });

@@ -7,10 +7,10 @@ Ext.define("CM.Class.Dashboard", {
                 type: 'ajax',
                 url: '/service/events',
                 api: {
-                    create  : "events/create",
-                    read    : "events/all",
-                    update  : "events/update",
-                    destroy : "events/destroy"
+                    create  : 'events/create',
+                    read    : 'events/all',
+                    update  : 'events/update',
+                    destroy : 'events/destroy'
                 },
                 reader: {
                     type: 'json',
@@ -28,9 +28,8 @@ Ext.define("CM.Class.Dashboard", {
         Ext.apply(this, {
             title: 'Dashboard',
             border: false,
-            id: "Dashboard-class",
-            eventStore: eventStore,
-            border: false
+            id: "dashboard-panel",
+            eventStore: eventStore
         });
 
         this.callParent(arguments);

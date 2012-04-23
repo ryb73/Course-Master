@@ -5,7 +5,7 @@ Ext.define("CM.Class.Home", {
 
         Ext.apply(this, {
             border: false,
-            id: this.class + "-class",
+            id: this.class + "-panel",
             title: this.class,
             items: [{
                 border: false,

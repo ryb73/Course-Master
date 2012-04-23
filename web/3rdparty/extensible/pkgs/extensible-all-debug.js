@@ -620,6 +620,11 @@ Extensible.calendar.data.EventMappings = {
         name:    'Reminder',
         mapping: 'rem',
         type:    'string'
+    },
+    Owner: {
+        name:    'Owner',
+        mapping: 'owner',
+        type:     'int'
     }
 };/**
  * @class Extensible.calendar.data.CalendarMappings
@@ -5189,6 +5194,7 @@ Ext.define('Extensible.calendar.form.EventWindow', {
     // Locale configs
     titleTextAdd: 'Add Event',
     titleTextEdit: 'Edit Event',
+    titleTextView: 'View Event',
     width: 600,
     labelWidth: 65,
     detailsLinkText: 'Edit Details...',
@@ -5197,13 +5203,14 @@ Ext.define('Extensible.calendar.form.EventWindow', {
     saveButtonText: 'Save',
     deleteButtonText: 'Delete',
     cancelButtonText: 'Cancel',
+    closeButtonText: 'Close',
     titleLabelText: 'Title',
     datesLabelText: 'When',
     calendarLabelText: 'Calendar',
     
     // General configs
     closeAction: 'hide',
-    modal: false,
+    modal: true,
     resizable: false,
     constrain: true,
     buttonAlign: 'left',
@@ -5263,52 +5270,50 @@ Ext.define('Extensible.calendar.form.EventWindow', {
             editdetails: true
         });
         
-        this.fbar = this.getFooterBarConfig();
-        
+        if (this.enableEditDetails) {
+            this.fbar = this.getFooterBarConfig();
+        }
+
         this.callParent(arguments);
     },
     
     getFooterBarConfig: function() {
-        var cfg = ['->', {
-                text: this.saveButtonText,
-                itemId: this.id + '-save-btn',
-                disabled: false,
-                handler: this.onSave, 
-                scope: this
-            },{
-                text: this.deleteButtonText, 
-                itemId: this.id + '-delete-btn',
-                disabled: false,
-                handler: this.onDelete,
-                scope: this,
-                hideMode: 'offsets' // IE requires this
-            },{
-                text: this.cancelButtonText,
-                itemId: this.id + '-cancel-btn',
-                disabled: false,
-                handler: this.onCancel,
-                scope: this
-            }];
-        
-        if(this.enableEditDetails !== false){
-            cfg.unshift({
-                xtype: 'tbtext',
-                itemId: this.id + '-details-btn',
-                text: '<a href="#" class="' + this.editDetailsLinkClass + '">' + this.detailsLinkText + '</a>'
-            });
-        }
-        return cfg;
+        return [{
+            xtype: 'tbtext',
+            itemId: this.id + '-details-btn',
+            text: '<a href="#" class="' + this.editDetailsLinkClass + '">' + this.detailsLinkText + '</a>'
+        }, '->', {
+            text: this.saveButtonText,
+            itemId: this.id + '-save-btn',
+            disabled: false,
+            handler: this.onSave, 
+            scope: this
+        },{
+            text: this.deleteButtonText, 
+            itemId: this.id + '-delete-btn',
+            disabled: false,
+            handler: this.onDelete,
+            scope: this,
+            hideMode: 'offsets' // IE requires this
+        },{
+            text: this.cancelButtonText,
+            itemId: this.id + '-cancel-btn',
+            disabled: false,
+            handler: this.onCancel,
+            scope: this
+        }];
     },
     
     // private
-    onRender : function(ct, position){        
+    onRender: function(ct, position) {
         this.formPanel = Ext.create('Ext.FormPanel', Ext.applyIf({
             fieldDefaults: {
                 labelWidth: this.labelWidth
             },
-            items: this.getFormItemConfigs()
+            items: this.getFormItemConfigs(),
+            padding: '0 10 10',
         }, this.formPanelConfig));
-        
+
         this.add(this.formPanel);
         
         this.callParent(arguments);
@@ -5320,7 +5325,7 @@ Ext.define('Extensible.calendar.form.EventWindow', {
             itemId: this.id + '-title',
             name: Extensible.calendar.data.EventMappings.Title.name,
             fieldLabel: this.titleLabelText,
-            anchor: '100%'
+            anchor: '95%'
         },{
             xtype: 'extensible.daterangefield',
             itemId: this.id + '-dates',
@@ -5351,11 +5356,13 @@ Ext.define('Extensible.calendar.form.EventWindow', {
 		this.el.addCls('ext-cal-event-win');
         
         this.initRefs();
-        
-        // This junk spacer item gets added to the fbar by Ext (fixed in 4.0.2)
-        var junkSpacer = this.getDockedItems('toolbar')[0].items.items[0];
-        if (junkSpacer.el.hasCls('x-component-default')) {
-            Ext.destroy(junkSpacer);
+
+        if (this.fbar) {
+            // This junk spacer item gets added to the fbar by Ext (fixed in 4.0.2)
+            var junkSpacer = this.getDockedItems('toolbar')[0].items.items[0];
+            if (junkSpacer.el.hasCls('x-component-default')) {
+                Ext.destroy(junkSpacer);
+            }
         }
     },
     
@@ -5401,14 +5408,19 @@ Ext.define('Extensible.calendar.form.EventWindow', {
             this.titleField.focus(false, 100);
         }, this]);
         
-        this.deleteButton[o.data && o.data[M.EventId.name] ? 'show' : 'hide']();
+        if (this.enableEditDetails) {
+            this.deleteButton[o.data && o.data[M.EventId.name] ? 'show' : 'hide']();
+        }
         
         var rec, f = this.formPanel.form;
 
         if(o.data){
             rec = o;
 			//this.isAdd = !!rec.data[Extensible.calendar.data.EventMappings.IsNew.name];
-			if(rec.phantom){
+            if (!this.enableEditDetails) {
+                this.setTitle(this.titleTextView);
+            }
+            else if(rec.phantom){
 				// Enable adding the default record that was passed in
 				// if it's new even if the user makes no changes 
 				//rec.markDirty();
@@ -5523,6 +5535,10 @@ Ext.define('Extensible.calendar.form.EventWindow', {
 //    },
     
     updateRecord: function(record, keepEditing) {
+        if (record.data[Extensible.calendar.data.EventMappings.Owner.name] != SessionGlobals.id) {
+            return;
+        }
+
         var fields = record.fields,
             values = this.formPanel.getForm().getValues(),
             name,
@@ -7033,62 +7049,95 @@ alert('End: '+bounds.end);
 	},
     
     // private
-    getEventEditor : function(){
-        // only create one instance of the edit window, even if there are multiple CalendarPanels
-        this.editWin = this.editWin || Ext.WindowMgr.get('ext-cal-editwin');
-         
-        if(!this.editWin){
-            this.editWin = Ext.create('Extensible.calendar.form.EventWindow', {
-                id: 'ext-cal-editwin',
-                calendarStore: this.calendarStore,
-                modal: this.editModal,
-                enableEditDetails: this.enableEditDetails,
-                listeners: {
-                    'eventadd': {
-                        fn: function(win, rec, animTarget) {
-                            //win.hide(animTarget);
-                            win.currentView.onEventAdd(null, rec);
+    getEventEditor : function(editable){
+    
+        if (editable) {
+            this.win = Ext.WindowMgr.get('ext-cal-editwin');
+             
+            if(!this.win) {
+                this.win = Ext.create('Extensible.calendar.form.EventWindow', {
+                    id: 'ext-cal-editwin',
+                    calendarStore: this.calendarStore,
+                    modal: true,
+                    enableEditDetails: true,
+                    listeners: {
+                        'eventadd': {
+                            fn: function(win, rec, animTarget) {
+                                //win.hide(animTarget);
+                                win.currentView.onEventAdd(null, rec);
+                            },
+                            scope: this
                         },
-                        scope: this
-                    },
-                    'eventupdate': {
-                        fn: function(win, rec, animTarget) {
-                            //win.hide(animTarget);
-                            win.currentView.onEventUpdate(null, rec);
+                        'eventupdate': {
+                            fn: function(win, rec, animTarget) {
+                                //win.hide(animTarget);
+                                win.currentView.onEventUpdate(null, rec);
+                            },
+                            scope: this
                         },
-                        scope: this
-                    },
-                    'eventdelete': {
-                        fn: function(win, rec, animTarget) {
-                            //win.hide(animTarget);
-                            win.currentView.onEventDelete(null, rec);
+                        'eventdelete': {
+                            fn: function(win, rec, animTarget) {
+                                //win.hide(animTarget);
+                                win.currentView.onEventDelete(null, rec);
+                            },
+                            scope: this
                         },
-                        scope: this
-                    },
-                    'editdetails': {
-                        fn: function(win, rec, animTarget, view) {
-                            // explicitly do not animate the hide when switching to detail
-                            // view as it looks weird visually
-                            win.animateTarget = null;
-                            win.hide();
-                            win.currentView.fireEvent('editdetails', win.currentView, rec);
+                        'editdetails': {
+                            fn: function(win, rec, animTarget, view) {
+                                // explicitly do not animate the hide when switching to detail
+                                // view as it looks weird visually
+                                win.animateTarget = null;
+                                win.hide();
+                                win.currentView.fireEvent('editdetails', win.currentView, rec);
+                            },
+                            scope: this
                         },
-                        scope: this
-                    },
-                    'eventcancel': {
-                        fn: function(win, rec, animTarget){
-                            this.dismissEventEditor(null, animTarget);
-                            win.currentView.onEventCancel();
-                        },
-                        scope: this
+                        'eventcancel': {
+                            fn: function(win, rec, animTarget){
+                                this.dismissEventEditor(null, animTarget);
+                                win.currentView.onEventCancel();
+                            },
+                            scope: this
+                        }
                     }
-                }
-            });
+                });
+            }
+        }
+        else {
+            this.win = Ext.WindowMgr.get('ext-cal-non-editwin');
+             
+            if(!this.win) {
+                this.win = Ext.create('Extensible.calendar.form.EventWindow', {
+                    id: 'ext-cal-non-editwin',
+                    calendarStore: this.calendarStore,
+                    modal: true,
+                    enableEditDetails: false,
+                    listeners: {
+                        'editdetails': {
+                            fn: function(win, rec, animTarget, view) {
+                                // explicitly do not animate the hide when switching to detail
+                                // view as it looks weird visually
+                                win.animateTarget = null;
+                                win.hide();
+                                win.currentView.fireEvent('editdetails', win.currentView, rec);
+                            },
+                            scope: this
+                        },
+                        'eventcancel': {
+                            fn: function(win, rec, animTarget){
+                                this.dismissEventEditor(null, animTarget);
+                                win.currentView.onEventCancel();
+                            },
+                            scope: this
+                        }
+                    }
+                });
+            }
         }
         
         // allows the window to reference the current scope in its callbacks
-        this.editWin.currentView = this;
-        return this.editWin;
+        this.win.currentView = this;
+        return this.win;
     },
     
     /**
@@ -7101,7 +7150,12 @@ alert('End: '+bounds.end);
      * @return {Extensible.calendar.view.AbstractCalendar} this
      */
     showEventEditor : function(rec, animateTarget){
-        this.getEventEditor().show(rec, animateTarget, this);
+        if (!rec.data || rec.data[Extensible.calendar.data.EventMappings.Owner.name] == SessionGlobals.id) {
+            this.getEventEditor(true).show(rec, animateTarget, this);
+        }
+        else {
+            this.getEventEditor(false).show(rec, animateTarget, this);
+        }
         return this;
     },
     
@@ -7235,7 +7289,8 @@ alert('End: '+bounds.end);
      * @param {Object} dt The new start date
      */
     moveEvent : function(rec, dt){
-        if(Extensible.Date.compare(rec.data[Extensible.calendar.data.EventMappings.StartDate.name], dt) === 0){
+        if(Extensible.Date.compare(rec.data[Extensible.calendar.data.EventMappings.StartDate.name], dt) === 0 ||
+           (rec.data[Extensible.calendar.data.EventMappings.Owner.name] != SessionGlobals.id)) {
             // no changes
             return;
         }
