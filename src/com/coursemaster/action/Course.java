@@ -11,48 +11,51 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.coursemaster.auth.AuthenticationManager;
 import com.coursemaster.auth.Session;
 import com.coursemaster.auth.Session.Role;
 import com.coursemaster.database.DatabaseConnectionManager;
 
-public class User implements RestfulResponder {
+public class Course implements RestfulResponder {
 
     @Override
     /**
-     * Method to create a new user
+     * Method to create a new course
      * This method should only be called by users with the ADMIN Role
      *
      * @param request The HTTP Request
      * @param response The HTTP Response
      */
     public void create(HttpServletRequest request, HttpServletResponse response) {
-        logger.trace("Attempting to create a new user");
+        logger.trace("Attempting to create a new course");
 
         try {
             response.setStatus(HttpServletResponse.SC_OK);
 
-            // Only admins can add new users
+            // Only admins can add new courses
             if (!((Session)request.getAttribute("session")).getRole().equals(Role.ADMIN)) {
                 response.getWriter().write(UNAUTHORIZED_RESPONSE);
             }
             else {
                 // Pull off required parameters
-                String fullname = request.getParameter("fullname");
-                String email = request.getParameter("email");
-                String password = request.getParameter("password");
-                String role = request.getParameter("role");
+                String name = request.getParameter("name");
+                String prof = request.getParameter("prof");
+                String dept = request.getParameter("dept");
+                String num  = request.getParameter("num" );
+                String sect = request.getParameter("sect");
+                String cred = request.getParameter("cred");
+                String sem  = request.getParameter("sem" );
 
                 // Ensure all required parameters are present
-                if (fullname == null || email == null || password == null || role == null) {
+                if (name == null || prof == null || num == null || dept == null ||
+                    sect == null || cred == null || sem == null) {
                     response.getWriter().write(PARAMS_MISSING_RESPONSE);
                 }
                 else {
-                    password = AuthenticationManager.authenticator.getHashedPassword(email, password);
-
+                    // Then execute the actual insertion
                     int res = DatabaseConnectionManager.executeInsert(String.format(
-                            "insert into user (fullname, email, password, role)" +
-                            " values ('%s', '%s', '%s', %s);", fullname, email, password, role));
+                            "insert into course (name, prof, dept, num, sect, cred, sem)" +
+                            " values ('%s', %s, '%s', %s, %s, %s, '%s');",
+                               name, prof, dept, num, sect, cred, sem));
 
                     // Check result value from database execution.
                     // Greater than 0 indicates success, less indicates failure.
@@ -65,7 +68,8 @@ public class User implements RestfulResponder {
 
     @Override
     public void delete(HttpServletRequest request, HttpServletResponse response) {
-        logger.trace("Attempting to remove a user");
+        logger.trace("Attempting to remove a course");
+
         try {
             response.setStatus(HttpServletResponse.SC_OK);
             Session session = (Session) request.getAttribute("session");
@@ -77,12 +81,12 @@ public class User implements RestfulResponder {
             else {
                 String id = request.getParameter("id");
 
-                // Requires id, can't delete self
-                if (id == null || String.valueOf(session.getId()).equals(id)) {
+                // Requires id
+                if (id == null) {
                     response.getWriter().write(PARAMS_MISSING_RESPONSE);
                 }
                 else {
-                    boolean success = DatabaseConnectionManager.executeDelete("delete from user where id = " + id);
+                    boolean success = DatabaseConnectionManager.executeDelete("delete from course where id = " + id);
 
                     response.getWriter().write(success ? BASIC_SUCCESS_RESPONSE : DATABASE_FAILURE_RESPONSE);
                 }
@@ -93,7 +97,7 @@ public class User implements RestfulResponder {
 
     @Override
     public void read(HttpServletRequest request, HttpServletResponse response) {
-        logger.trace("Attempting to retrieve users");
+        logger.trace("Attempting to retrieve courses");
 
         boolean allMode = request.getRequestURI().endsWith("/all");
         Session session = (Session) request.getAttribute("session");
@@ -112,13 +116,14 @@ public class User implements RestfulResponder {
                 // Otherwise, parse to integer
                 else {
                     int id = Integer.parseInt(idString);
-                    // If the current user isn't an administrator, but is requesting
-                    // another user's information, we mark that as unauthorized
-                    if (session.getId() != id && !session.getRole().equals(Role.ADMIN)) {
+                    // If the current user isn't an administrator
+                    // TODO or the user is not enrolled in the course
+                    if (!session.getRole().equals(Role.ADMIN)) {
                         response.getWriter().write(UNAUTHORIZED_RESPONSE);
                     }
                     else {
-                        JSONObject rspObj = DatabaseConnectionManager.executeQuery("select id, fullname, email, role from user where id = " + id);
+                        JSONObject rspObj = DatabaseConnectionManager.executeQuery(
+                            "select id, name, prof, dept, num, sect, cred, sem from course where id = " + id);
                         response.getWriter().write(rspObj == null ? DATABASE_FAILURE_RESPONSE : rspObj.toString());
                     }
                 }
@@ -128,7 +133,7 @@ public class User implements RestfulResponder {
                 response.getWriter().write(UNAUTHORIZED_RESPONSE);
             }
             else {
-                JSONObject rspObj = DatabaseConnectionManager.executeQuery("select id, fullname, email, role from user;");
+                JSONObject rspObj = DatabaseConnectionManager.executeQuery("select * from course;");
                 response.getWriter().write(rspObj == null ? DATABASE_FAILURE_RESPONSE : rspObj.toString());
             }
         }
@@ -138,7 +143,7 @@ public class User implements RestfulResponder {
     @SuppressWarnings("unchecked")
     @Override
     public void update(HttpServletRequest request, HttpServletResponse response) {
-        logger.trace("Attempting to update a user");
+        logger.trace("Attempting to update a course");
 
         String idString = request.getParameter("id");
 
@@ -151,38 +156,43 @@ public class User implements RestfulResponder {
                 int id = Integer.parseInt(idString);
                 Session session = (Session) request.getAttribute("session");
 
-                // If the user id isn't the current user, and the current
-                // user isn't an administrator, the request is unauthorized
-                if (session.getId() != id && !session.getRole().equals(Role.ADMIN)) {
+                // If the current user isn't an administrator, the request is unauthorized
+                if (!session.getRole().equals(Role.ADMIN)) {
                     response.getWriter().write(UNAUTHORIZED_RESPONSE);
                 }
                 else {
-                    JSONObject userPoll = DatabaseConnectionManager.executeQuery("select * from user where id = " + id);
+                    JSONObject coursePoll = DatabaseConnectionManager.executeQuery("select * from course where id = " + id);
 
-                    if (userPoll == null) {
+                    if (coursePoll == null) {
                         response.getWriter().write(DATABASE_FAILURE_RESPONSE);
                     }
                     else {
-                        HashMap<String,Object> userData = (HashMap<String,Object>)((JSONArray) userPoll.get("data")).get(0);
-                        String fullname = request.getParameter("fullname");
-                        String password = request.getParameter("password");
-                        String role = request.getParameter("role");
+                        HashMap<String,Object> courseData = (HashMap<String,Object>)((JSONArray) coursePoll.get("data")).get(0);
 
-                        // To update password, you must hash against email
-                        if (password != null) {
-                            userData.put("password",
-                                    AuthenticationManager.authenticator.getHashedPassword(
-                                            (String) userData.get("email"), password));
-                        }
+                        String name = request.getParameter("name");
+                        String prof = request.getParameter("prof");
+                        String dept = request.getParameter("dept");
+                        String num  = request.getParameter("num" );
+                        String sect = request.getParameter("sect");
+                        String cred = request.getParameter("cred");
+                        String sem  = request.getParameter("sem" );
 
-                        if (role != null) { userData.put("role", role); }
-                        if (fullname != null) { userData.put("fullname", fullname); }
+                        if (name != null) { courseData.put("name", name); }
+                        if (prof != null) { courseData.put("prof", Integer.parseInt(prof)); }
+                        if (dept != null) { courseData.put("dept", dept); }
+                        if (num  != null) { courseData.put("num", Integer.parseInt(num)); }
+                        if (sect != null) { courseData.put("sect", Integer.parseInt(sect)); }
+                        if (cred != null) { courseData.put("cred", Integer.parseInt(cred)); }
+                        if (sem  != null) { courseData.put("sem", sem); }
 
                         int updated = DatabaseConnectionManager.executeUpdate(String.format(
-                                "update user set password = '%s'," +
-                                " fullname = '%s', role = %s where id = %s;",
-                                (String) userData.get("password"),(String) userData.get("fullname"), 
-                                 ((Integer) userData.get("role")).toString(), idString));
+                                "update course set" +
+                                " name = '%s', prof = %s, dept = '%s', num = %s," +
+                                " sect = %s, cred = %s, sem  = '%s' where id = %s;",
+                                 (String)  courseData.get("name"), ((Integer) courseData.get("prof")).toString(),
+                                 (String)  courseData.get("dept"), ((Integer) courseData.get("num" )).toString(),
+                                ((Integer) courseData.get("sect")).toString(), ((Integer) courseData.get("cred")).toString(),
+                                 (String)  courseData.get("sem"), idString));
                         response.getWriter().write(updated == 1 ? BASIC_SUCCESS_RESPONSE : DATABASE_FAILURE_RESPONSE);
                     }
                 }

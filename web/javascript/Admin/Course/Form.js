@@ -5,8 +5,11 @@ Ext.define("CM.Admin.Course.Form", {
         var profs = new Ext.data.Store({
             fields: ['value', 'name'],
             data : [
-                { value: 1, name: 'Jayson Rock'       },
-                { value: 2, name: 'John Boyland'     }
+                { value: 5, name: 'John Boyland' },
+                { value: 6, name: 'Jayson Rock' },
+                { value: 7, name: 'Joseph Bockhorst' },
+                { value: 8, name: 'Mukal Goyal' },
+                { value: 9, name: 'Hossein Hosseini' }
             ]
         });
 
@@ -63,10 +66,10 @@ Ext.define("CM.Admin.Course.Form", {
                     if (form.isValid()) {
                         form.submit({
                             success: function(form, action) {
-                               Ext.Msg.alert('Success', action.result.msg);
+                               Ext.Msg.alert('Success', 'The course was successfully added');
                             },
                             failure: function(form, action) {
-                                Ext.Msg.alert('Failed', action.result.msg);
+                                Ext.Msg.alert('Failed', action.result.errors.message);
                             }
                         });
                     }
