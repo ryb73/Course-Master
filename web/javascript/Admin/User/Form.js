@@ -53,10 +53,10 @@ Ext.define("CM.Admin.User.Form", {
                     if (form.isValid()) {
                         form.submit({
                             success: function(form, action) {
-                               Ext.Msg.alert('Success', action.result.msg);
+                               Ext.Msg.alert('Success', 'Your entry was successfully stored.');
                             },
                             failure: function(form, action) {
-                                Ext.Msg.alert('Failed', action.result.msg);
+                                Ext.Msg.alert('Failed', action.result.errors.message);
                             }
                         });
                     }

@@ -1,6 +1,7 @@
 package com.coursemaster.servlet;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -12,15 +13,13 @@ import org.apache.log4j.Logger;
 
 import com.coursemaster.auth.AuthenticationManager;
 import com.coursemaster.auth.Session;
-import com.coursemaster.database.DatabaseConnectionManager;
 import com.coursemaster.server.Settings;
+import com.coursemaster.servlet.util.StringUtil;
 
 /**
  * This servlet acts as a sort of basic function servlet.
  * It is primarily responsible for session management actions
  * such as logging users in and out
- *
- * TODO Make this servlet more restful
  *
  * @author Graham
  */
@@ -40,8 +39,8 @@ public class ActionServlet extends HttpServlet {
         if (function.equals("logout")) {
             doLogout(request, response);
         }
-        else if (function.equals("update-user")) {
-            doUserUpdate(request, response);
+        else {
+            doRestfulResponse(function, request, response);
         }
     }
 
@@ -59,37 +58,36 @@ public class ActionServlet extends HttpServlet {
         if (function.equals("login")) {
             doLogin(request, response);
         }
-        else if (function.equals("user/new") || function.equals("course/new")) {
-            // TODO Actually handle these requests
-            response.getWriter().write("{ success: true }");
-        }
-        else if (function.equals("update-user")) {
-            doUserUpdate(request, response);
+        else {
+            doRestfulResponse(function, request, response);
         }
     }
 
     /**
-     * Method to update a user
+     * Attempt to respond to a restful request
+     * IE: /user/create would invoke User.create()
      *
+     * @param function The URI function piece
      * @param request The HTTP Request
-     * @param resposne The HTTP Response
+     * @param response The HTTP Response
      */
-    private void doUserUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-
-        if (email == null || email.equals("")) {
-            response.getWriter().write("No user specified");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+    private void doRestfulResponse(String function, HttpServletRequest request, HttpServletResponse response) {
+        // Split the method by slashes
+        String restPieces[] = function.split("/");
+        try {
+            // Find the class (within our package) scheme
+            Class<?> cls = Class.forName("com.coursemaster.action." + StringUtil.capitalize(restPieces[0]));
+            // Attempt to locate method
+            Method method = cls.getDeclaredMethod(restPieces[1], HttpServletRequest.class, HttpServletResponse.class);
+            // Call method
+            method.invoke(cls.newInstance(), request, response);
+        } catch (Exception e) {
+            try {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{ success: false, errors: { message: 'The model and method combination you specified could not be located' }}");
+            }
+            catch (IOException ioe) {}
         }
-
-        String encryptedPassword = AuthenticationManager.authenticator.getHashedPassword(email, password);
-
-        int updated = DatabaseConnectionManager.executeUpdate("update user set password = '" + encryptedPassword + "' where email = '" + email + "';");
-
-        response.getWriter().write((updated < 1 ? "Failed to update " : "Successfully updated ") + "password for " + email);
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     /**

@@ -7,8 +7,8 @@ Ext.define("CM.Content.Panel", {
 
         if (SessionGlobals.role == '3') {
             items.push([
-                new CM.Admin.User.Form({ url: '/action/user/new' }),
-                new CM.Admin.Course.Form({ url: '/action/course/new' })
+                new CM.Admin.User.Form({ url: '/action/user/create' }),
+                new CM.Admin.Course.Form({ url: '/action/course/create' })
             ]);
         }
 

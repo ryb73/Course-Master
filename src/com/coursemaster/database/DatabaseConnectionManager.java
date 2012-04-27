@@ -224,7 +224,8 @@ public abstract class DatabaseConnectionManager {
         "fullname VARCHAR(32)  NOT NULL," +
         "email    VARCHAR(32)  NOT NULL," +
         "password VARCHAR(256) NOT NULL," +
-        "role     INT          NOT NULL);";
+        "role     INT          NOT NULL," +
+        "UNIQUE (email));";
     private static final String COURSE_TABLE_SCRIPT =
         "create table course(" +
         "id   INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +
