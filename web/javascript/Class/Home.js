@@ -17,6 +17,11 @@ Ext.define("CM.Class.Home", {
                 handler: this.loadBoard
             }, {
                 xtype: 'button',
+                text: 'Dropbox',
+                class: this.class,
+                handler: this.loadDropbox
+            }, {
+                xtype: 'button',
                 text: 'Course Syllabus',
                 class: this.class,
                 handler: this.loadEvents
@@ -32,6 +37,14 @@ Ext.define("CM.Class.Home", {
         }
 
         PageGlobals.contentPanel.getLayout().setActiveItem(btn.class + '-board-root');
+    },
+	
+    loadDropbox: function(btn, evt) {                        
+        if (!PageGlobals.contentPanel.getChildByElement(btn.class + "-dropbox-root")) {
+            PageGlobals.contentPanel.add(new CM.Dropbox.DRoot({ class: btn.class, courseId: this.ownerCt.courseId })); 
+        }
+
+        PageGlobals.contentPanel.getLayout().setActiveItem(btn.class + '-dropbox-root');
     },
 
     loadEvents: function(btn, evt) {
