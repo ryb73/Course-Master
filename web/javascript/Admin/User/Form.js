@@ -12,7 +12,7 @@ Ext.define("CM.Admin.User.Form", {
         });
 
         Ext.apply(this, {
-            id: 'user-form-panel',
+            id: 'User-Form-panel',
             title: 'New User Form',
             border: false,
             layout: 'anchor',

@@ -28,7 +28,7 @@ Ext.define("CM.Class.Dashboard", {
         Ext.apply(this, {
             title: 'Dashboard',
             border: false,
-            id: "dashboard-panel",
+            id: "Dashboard-panel",
             eventStore: eventStore
         });
 

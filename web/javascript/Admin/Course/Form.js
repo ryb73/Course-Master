@@ -14,7 +14,7 @@ Ext.define("CM.Admin.Course.Form", {
         });
 
         Ext.apply(this, {
-            id: 'course-form-panel',
+            id: 'Course-Form-panel',
             title: 'New Course Form',
             border: false,
             layout: 'anchor',
