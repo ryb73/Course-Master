@@ -23,26 +23,25 @@ public class CreateDropboxes extends AbstractService {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-    	try {
-            JSONObject data = new JSONObject(request.getParameter("data"));
-            String name = data.getString("name");
-            String ext = data.getString("ext");
-            String course = data.getString("course");
-//            String start = data.getString("start");
-//            String end = data.getString("end");
-
-//            String userId = String.valueOf(((Session) request.getAttribute("session")).getId());
-
-            DatabaseConnectionManager.executeUpdate(String.format(
-               "insert into folder (name,course,ext,start,end,disp)" +
-              " values ('%s', '%s', '%s', NOW(), NOW(), NOW());",
-              name, course, ext));
  
-//            System.out.println("INSERTED");
-            
-            response.setContentType("application/json");
-            response.setContentLength(0);
-        } catch (JSONException e) { e.printStackTrace(); }
+//            String name = data.getString("name");
+//            String ext = data.getString("ext");
+//            String course = data.getString("course");
+//      String start = data.getString("start");
+//      String end = data.getString("end");
+//      String userId = String.valueOf(((Session) request.getAttribute("session")).getId());
+        
+        String name = request.getParameter("name");
+        String ext = request.getParameter("ext");
+        String course = request.getParameter("course");
+
+        DatabaseConnectionManager.executeInsert(String.format(
+           "insert into folder (name,course,ext,start,end,disp)" +
+           " values ('%s', '%s', '%s', NOW(), NOW(), NOW());",
+           name, course, ext));
+        
+        response.setContentType("application/json");
+        response.setContentLength(0);
     }
 
 }

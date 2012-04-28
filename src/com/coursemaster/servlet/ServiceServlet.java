@@ -17,6 +17,8 @@ import com.coursemaster.service.event.DestroyEvent;
 import com.coursemaster.service.event.GetAllEvents;
 import com.coursemaster.service.event.GetCourseEvents;
 import com.coursemaster.service.event.UpdateEvent;
+import com.coursemaster.service.file.CreateDropboxes;
+import com.coursemaster.service.file.GetDropboxes;
 
 /**
  * The servlet for services requests, likely
@@ -51,6 +53,9 @@ public class ServiceServlet extends HttpServlet {
         else if (function.startsWith("discussion")) {
             new Discussion().doRequest(request, response);
         }
+        else if (function.equals("get-dropbox")) {
+            new GetDropboxes().doRequest(request, response);
+        }
         else if (function.equals("courses")) {
             new Courses().doRequest(request, response);
         }
@@ -73,6 +78,9 @@ public class ServiceServlet extends HttpServlet {
         }
         else if (function.equals("events/create")) {
             new CreateEvent().doRequest(request, response);
+        }
+        else if (function.equals("create-dropbox")) { 
+            new CreateDropboxes().doRequest(request, response);
         }
         else if (function.equals("events/update")) {
             new UpdateEvent().doRequest(request, response);
