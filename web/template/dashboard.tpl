@@ -14,11 +14,16 @@
 
         <!-- Course Master Files -->
         <link rel="stylesheet" type="text/css" href="/stylesheet/Main.css" />
+        <script type="text/javascript" src="/javascript/Admin/User/Form.js"></script>
+        <script type="text/javascript" src="/javascript/Admin/Course/Form.js"></script>
+
         <script type="text/javascript" src="/javascript/Class/Home.js"></script>
         <script type="text/javascript" src="/javascript/Class/Dashboard.js"></script>
         <script type="text/javascript" src="/javascript/Class/Discussion/Root.js"></script>
 		<script type="text/javascript" src="/javascript/Class/Discussion/ThreadList.js"></script>
         <script type="text/javascript" src="/javascript/Class/Event/Root.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Dropbox/file-upload.js"></script>          
+        <script type="text/javascript" src="/javascript/Class/Dropbox/DRoot.js"></script>   
 
         <script type="text/javascript" src="/javascript/Global/Content.js"></script>
         <script type="text/javascript" src="/javascript/Global/Dashboard.js"></script>
