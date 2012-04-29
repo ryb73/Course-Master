@@ -57,10 +57,24 @@ public class Discussion extends AbstractService {
             command = command.substring(11);
             if(command.equals("get-boards")) {
                 getBoards(request, response);
+            } else if(command.equals("get-topics")) {
+                getTopics(request, response);
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
         }
+    }
+
+    private void getTopics(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject rsp = DatabaseConnectionManager.executeQuery(String.format(
+                "select topic.id, topic.name, root.owner postedBy, root.dte postedOn, 1 replies " +
+                "from discussion_topic topic " +
+                "join discussion_post root on root.id = topic.post " +
+                "where topic.board = %s",
+                request.getParameter("boardId")));
+
+          response.setStatus(HttpServletResponse.SC_OK);
+          response.getWriter().write(rsp.toString());
     }
 
     private void getBoards(HttpServletRequest request, HttpServletResponse response) throws IOException {

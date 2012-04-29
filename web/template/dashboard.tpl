@@ -17,6 +17,7 @@
         <script type="text/javascript" src="/javascript/Class/Home.js"></script>
         <script type="text/javascript" src="/javascript/Class/Dashboard.js"></script>
         <script type="text/javascript" src="/javascript/Class/Discussion/Root.js"></script>
+		<script type="text/javascript" src="/javascript/Class/Discussion/ThreadList.js"></script>
         <script type="text/javascript" src="/javascript/Class/Event/Root.js"></script>
 
         <script type="text/javascript" src="/javascript/Global/Content.js"></script>

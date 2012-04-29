@@ -75,7 +75,11 @@ Ext.define('CM.Discussion.Root', {
     },
 
     onItemDblClick: function(view, record) {
-        console.log("Double clicked: " + record.get("id"));
+        if (!PageGlobals.contentPanel.getChildByElement(this.class + "-thread-list")) {
+            PageGlobals.contentPanel.add(new CM.Discussion.ThreadList({ class: this.class, courseId: this.courseId, boardId: record.get("id"), boardName: record.get("name") }));
+        }
+
+        PageGlobals.contentPanel.getLayout().setActiveItem(this.class + '-thread-list');
     },
 
     addBoard: function() {
