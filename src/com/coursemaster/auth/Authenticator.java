@@ -22,12 +22,25 @@ import com.coursemaster.auth.Session.Role;
 public abstract class Authenticator {
 
     /**
-     * Constructor just for settings cookie name
+     * Initializer for Authenticator. Manages an internal
+     * instance of the authenticator a subclass.
+     *
+     * @param authType User to determine which subclass to create
      * @param _cookieName Cookie Name
      */
-    public Authenticator(String _cookieName) {
+    public static void init(String authType, String _cookieName) {
         cookieName = _cookieName;
+        if (authType == null || authType.equals("Mock")) {
+            authenticator = new MockAuthenticator();
+        }
+        else if (authType.equals("Database")) {
+            authenticator = new DatabaseAuthenticator();
+        }
+        else {
+            throw new IllegalArgumentException("Invalid authentication type specified");
+        }
     }
+
     /**
      * Base login method, to be overridden
      * @param email The email
@@ -75,7 +88,7 @@ public abstract class Authenticator {
      * @param sessionKey The key of the desired session
      * @return The session for the sessionKey
      */
-    public Session getSession(String sessionKey) {
+    public static Session getSession(String sessionKey) {
         return sessions.get(sessionKey);
     }
 
@@ -111,6 +124,7 @@ public abstract class Authenticator {
     }
 
     protected static Logger logger = Logger.getLogger(Authenticator.class);
+    public static Authenticator authenticator;
     public static String cookieName;
     private static final HashMap<String, Session> sessions = new HashMap<String, Session>();
     private static final SecureRandom randomGenerator = new SecureRandom();

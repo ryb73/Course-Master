@@ -6,7 +6,7 @@ import java.util.Properties;
 
 import org.apache.log4j.xml.DOMConfigurator;
 
-import com.coursemaster.auth.AuthenticationManager;
+import com.coursemaster.auth.Authenticator;
 import com.coursemaster.database.DatabaseConnectionManager;
 import com.coursemaster.servlet.util.EmailUtil;
 
@@ -52,9 +52,10 @@ public class Settings {
 
             port = Integer.parseInt(configProperties.getProperty("serverport"));
 
+            // Load Authentication configuration
             String authenticationMode = configProperties.getProperty("authtype");
             String authCookie = configProperties.getProperty("authcookie");
-            AuthenticationManager.init(authenticationMode, authCookie);
+            Authenticator.init(authenticationMode, authCookie);
 
             // Load Database configuration
             String dbname = configProperties.getProperty("dbname");

@@ -11,9 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.coursemaster.auth.AuthenticationManager;
+import com.coursemaster.auth.Authenticator;
 import com.coursemaster.auth.Session;
-import com.coursemaster.server.Settings;
 import com.coursemaster.servlet.util.StringUtil;
 
 /**
@@ -102,8 +101,8 @@ public class ActionServlet extends HttpServlet {
 
         // Kill the cookie
         for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals(Settings.cookieName)) {
-                AuthenticationManager.authenticator.logout(cookie.getValue());
+            if (cookie.getName().equals(Authenticator.cookieName)) {
+                Authenticator.authenticator.logout(cookie.getValue());
                 cookie.setMaxAge(-1);
                 response.addCookie(cookie);
             }
@@ -132,7 +131,7 @@ public class ActionServlet extends HttpServlet {
         }
 
         logger.trace("Attempting to create session for user: " + email);
-        Cookie sessionCookie = AuthenticationManager.authenticator.login(email, password);
+        Cookie sessionCookie = Authenticator.authenticator.login(email, password);
 
         if (sessionCookie == null) {
             response.addHeader("Location", "/login.html?login=false");

@@ -36,7 +36,4 @@ public class DatabaseAuthenticator extends Authenticator {
 
         return null;
     }
-
-    // Just passes through
-    public DatabaseAuthenticator(String cookieName) { super(cookieName); }
 }

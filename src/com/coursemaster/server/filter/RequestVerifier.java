@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.coursemaster.auth.AuthenticationManager;
 import com.coursemaster.auth.Authenticator;
 
 /**
@@ -91,7 +90,7 @@ public class RequestVerifier implements Filter {
                 // If the cookie matches the server cookie, look
                 // for that cookie in the current list of sessions
                 if(Authenticator.hasSession(cookie.getValue())) {
-                    request.setAttribute("session", AuthenticationManager.authenticator.getSession(cookie.getValue()));
+                    request.setAttribute("session", Authenticator.getSession(cookie.getValue()));
                     return true;
                 }
 
