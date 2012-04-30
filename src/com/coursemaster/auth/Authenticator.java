@@ -12,7 +12,6 @@ import javax.servlet.http.Cookie;
 import org.apache.log4j.Logger;
 
 import com.coursemaster.auth.Session.Role;
-import com.coursemaster.server.Settings;
 
 /**
  * Base class for authentication, designed to support interfacing
@@ -21,6 +20,14 @@ import com.coursemaster.server.Settings;
  * @author Graham
  */
 public abstract class Authenticator {
+
+    /**
+     * Constructor just for settings cookie name
+     * @param _cookieName Cookie Name
+     */
+    public Authenticator(String _cookieName) {
+        cookieName = _cookieName;
+    }
     /**
      * Base login method, to be overridden
      * @param email The email
@@ -45,7 +52,7 @@ public abstract class Authenticator {
         sessions.put(sessionKey, new Session(id, user, email, role));
 
         // Generate and return the session
-        Cookie sessionCookie =  new Cookie(Settings.cookieName, sessionKey);
+        Cookie sessionCookie =  new Cookie(cookieName, sessionKey);
         sessionCookie.setPath("/");
 
         return sessionCookie;
@@ -58,7 +65,7 @@ public abstract class Authenticator {
      * @param sessionKey The key to look for
      * @return Whether the key exists in the session list
      */
-    public boolean hasSession(String sessionKey) {
+    public static boolean hasSession(String sessionKey) {
         return sessions.containsKey(sessionKey);
     }
 
@@ -104,6 +111,7 @@ public abstract class Authenticator {
     }
 
     protected static Logger logger = Logger.getLogger(Authenticator.class);
+    public static String cookieName;
     private static final HashMap<String, Session> sessions = new HashMap<String, Session>();
     private static final SecureRandom randomGenerator = new SecureRandom();
 }

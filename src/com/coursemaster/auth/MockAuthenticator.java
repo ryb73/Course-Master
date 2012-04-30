@@ -27,4 +27,7 @@ public class MockAuthenticator extends Authenticator {
     public Cookie login(String email, String password) {
         return generateSession(0, email, email, Role.STUDENT);
     }
+
+    // Just passes through
+    public MockAuthenticator(String cookieName) { super(cookieName); }
 }

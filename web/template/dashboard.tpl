@@ -21,7 +21,6 @@
         <script type="text/javascript" src="/javascript/Class/Dashboard.js"></script>
         <script type="text/javascript" src="/javascript/Class/Discussion/Root.js"></script>
         <script type="text/javascript" src="/javascript/Class/Event/Root.js"></script>
-        <script type="text/javascript" src="/javascript/Class/Dropbox/file-upload.js"></script>          
         <script type="text/javascript" src="/javascript/Class/Dropbox/DRoot.js"></script>   
 
         <script type="text/javascript" src="/javascript/Global/Content.js"></script>

@@ -109,7 +109,7 @@ public class ActionServlet extends HttpServlet {
             }
         }
 
-        response.sendRedirect("/login.html");
+        response.sendRedirect("/login.html?logout=true");
         response.addHeader("AUTHENTICATION", "Successfully logged out");
         response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
     }
@@ -124,9 +124,8 @@ public class ActionServlet extends HttpServlet {
         String email = request.getParameter("email"),
                password = request.getParameter("password");
 
-        if (email == null || email == "" ||
-            password == null || password == "") {
-            response.addHeader("Location", "/login.html");
+        if (email == null || email == "" || password == null || password == "") {
+            response.addHeader("Location", "/login.html?login=false");
             response.addHeader("FAILURE-REASON", "Both username and password are required to login");
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             return;
@@ -136,7 +135,7 @@ public class ActionServlet extends HttpServlet {
         Cookie sessionCookie = AuthenticationManager.authenticator.login(email, password);
 
         if (sessionCookie == null) {
-            response.addHeader("Location", "/login.html");
+            response.addHeader("Location", "/login.html?login=false");
             response.addHeader("FAILURE-REASON", "Failed to login with that username/password combination");
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             return;
