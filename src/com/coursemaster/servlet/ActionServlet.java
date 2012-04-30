@@ -102,7 +102,7 @@ public class ActionServlet extends HttpServlet {
         // Kill the cookie
         for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals(Authenticator.cookieName)) {
-                Authenticator.authenticator.logout(cookie.getValue());
+                Authenticator.logout(cookie.getValue());
                 cookie.setMaxAge(-1);
                 response.addCookie(cookie);
             }
@@ -131,7 +131,7 @@ public class ActionServlet extends HttpServlet {
         }
 
         logger.trace("Attempting to create session for user: " + email);
-        Cookie sessionCookie = Authenticator.authenticator.login(email, password);
+        Cookie sessionCookie = Authenticator.login(email, password);
 
         if (sessionCookie == null) {
             response.addHeader("Location", "/login.html?login=false");

@@ -11,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.coursemaster.auth.AuthenticationManager;
+import com.coursemaster.auth.Authenticator;
 import com.coursemaster.auth.Session;
 import com.coursemaster.auth.Session.Role;
 import com.coursemaster.database.DatabaseConnectionManager;
@@ -48,7 +48,7 @@ public class User implements RestfulResponder {
                     response.getWriter().write(PARAMS_MISSING_RESPONSE);
                 }
                 else {
-                    password = AuthenticationManager.authenticator.getHashedPassword(email, password);
+                    password = Authenticator.getHashedPassword(email, password);
 
                     int res = DatabaseConnectionManager.executeInsert(String.format(
                             "insert into user (fullname, email, password, role)" +
@@ -171,8 +171,7 @@ public class User implements RestfulResponder {
                         // To update password, you must hash against email
                         if (password != null) {
                             userData.put("password",
-                                    AuthenticationManager.authenticator.getHashedPassword(
-                                            (String) userData.get("email"), password));
+                                    Authenticator.getHashedPassword((String) userData.get("email"), password));
                         }
 
                         if (role != null) { userData.put("role", role); }

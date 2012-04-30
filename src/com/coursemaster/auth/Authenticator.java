@@ -42,14 +42,28 @@ public abstract class Authenticator {
     }
 
     /**
-     * Base login method, to be overridden
+     * Base login method to be statically accessed
      * @param email The email
      * @param password The password
-     * @return A cookie on valid credentials, or null
+     * @return A cookie on valid credential entry, or null
      */
-    public abstract Cookie login(String email, String password);
+    public static Cookie login(String email, String password) {
+        return authenticator.doLogin(email, password);
+    }
 
-    public void logout(String sessionKey) {
+    /**
+     * Subclass dependent login method
+     * @param email The email
+     * @param password The password
+     * @return A cookie on valid credential entry, or null
+     */
+    public abstract Cookie doLogin(String email, String password);
+
+    /**
+     * Kill a session
+     * @param sessionKey The session to kill
+     */
+    public static void logout(String sessionKey) {
         sessions.remove(sessionKey);
     }
     /**
@@ -99,7 +113,7 @@ public abstract class Authenticator {
      * @param password The password
      * @return Encrypted password
      */
-    public String getHashedPassword(String email, String password) {
+    public static String getHashedPassword(String email, String password) {
         MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-1");

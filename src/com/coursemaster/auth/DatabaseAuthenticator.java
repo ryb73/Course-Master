@@ -14,7 +14,7 @@ public class DatabaseAuthenticator extends Authenticator {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Cookie login(String email, String password) {
+    public Cookie doLogin(String email, String password) {
         String encryptedPassword = getHashedPassword(email, password);
 
         try {
