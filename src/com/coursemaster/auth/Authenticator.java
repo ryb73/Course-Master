@@ -21,6 +21,9 @@ import com.coursemaster.auth.Session.Role;
  */
 public abstract class Authenticator {
 
+    // Name used for Cookie creation
+    public static String cookieName;
+
     /**
      * Initializer for Authenticator. Manages an internal
      * instance of the authenticator a subclass.
@@ -66,6 +69,19 @@ public abstract class Authenticator {
     public static void logout(String sessionKey) {
         sessions.remove(sessionKey);
     }
+
+    /**
+     * Method to generate a random password
+     * @return A password
+     */
+    public static String generatePassword() {
+        char[] pass = new char[8];
+        for (int index= 0; index < 8; index++) {
+            pass[index] = passCharString.charAt(randomGenerator.nextInt(62));
+        }
+        return new String(pass);
+    }
+
     /**
      * Internal method to construct a random key for the cookie
      * @param user The user to assign the key to
@@ -138,8 +154,8 @@ public abstract class Authenticator {
     }
 
     protected static Logger logger = Logger.getLogger(Authenticator.class);
-    public static Authenticator authenticator;
-    public static String cookieName;
+    private static Authenticator authenticator;
     private static final HashMap<String, Session> sessions = new HashMap<String, Session>();
     private static final SecureRandom randomGenerator = new SecureRandom();
+    private static String passCharString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 }
