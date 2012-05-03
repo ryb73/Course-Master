@@ -12,7 +12,6 @@ import javax.servlet.http.Cookie;
 import org.apache.log4j.Logger;
 
 import com.coursemaster.auth.Session.Role;
-import com.coursemaster.server.Settings;
 
 /**
  * Base class for authentication, designed to support interfacing
@@ -21,17 +20,68 @@ import com.coursemaster.server.Settings;
  * @author Graham
  */
 public abstract class Authenticator {
+
+    // Name used for Cookie creation
+    public static String cookieName;
+
     /**
-     * Base login method, to be overridden
+     * Initializer for Authenticator. Manages an internal
+     * instance of the authenticator a subclass.
+     *
+     * @param authType User to determine which subclass to create
+     * @param _cookieName Cookie Name
+     */
+    public static void init(String authType, String _cookieName) {
+        cookieName = _cookieName;
+        if (authType == null || authType.equals("Mock")) {
+            authenticator = new MockAuthenticator();
+        }
+        else if (authType.equals("Database")) {
+            authenticator = new DatabaseAuthenticator();
+        }
+        else {
+            throw new IllegalArgumentException("Invalid authentication type specified");
+        }
+    }
+
+    /**
+     * Base login method to be statically accessed
      * @param email The email
      * @param password The password
-     * @return A cookie on valid credentials, or null
+     * @return A cookie on valid credential entry, or null
      */
-    public abstract Cookie login(String email, String password);
+    public static Cookie login(String email, String password) {
+        return authenticator.doLogin(email, password);
+    }
 
-    public void logout(String sessionKey) {
+    /**
+     * Subclass dependent login method
+     * @param email The email
+     * @param password The password
+     * @return A cookie on valid credential entry, or null
+     */
+    public abstract Cookie doLogin(String email, String password);
+
+    /**
+     * Kill a session
+     * @param sessionKey The session to kill
+     */
+    public static void logout(String sessionKey) {
         sessions.remove(sessionKey);
     }
+
+    /**
+     * Method to generate a random password
+     * @return A password
+     */
+    public static String generatePassword() {
+        char[] pass = new char[8];
+        for (int index= 0; index < 8; index++) {
+            pass[index] = passCharString.charAt(randomGenerator.nextInt(62));
+        }
+        return new String(pass);
+    }
+
     /**
      * Internal method to construct a random key for the cookie
      * @param user The user to assign the key to
@@ -45,7 +95,7 @@ public abstract class Authenticator {
         sessions.put(sessionKey, new Session(id, user, email, role));
 
         // Generate and return the session
-        Cookie sessionCookie =  new Cookie(Settings.cookieName, sessionKey);
+        Cookie sessionCookie =  new Cookie(cookieName, sessionKey);
         sessionCookie.setPath("/");
 
         return sessionCookie;
@@ -58,7 +108,7 @@ public abstract class Authenticator {
      * @param sessionKey The key to look for
      * @return Whether the key exists in the session list
      */
-    public boolean hasSession(String sessionKey) {
+    public static boolean hasSession(String sessionKey) {
         return sessions.containsKey(sessionKey);
     }
 
@@ -68,7 +118,7 @@ public abstract class Authenticator {
      * @param sessionKey The key of the desired session
      * @return The session for the sessionKey
      */
-    public Session getSession(String sessionKey) {
+    public static Session getSession(String sessionKey) {
         return sessions.get(sessionKey);
     }
 
@@ -79,7 +129,7 @@ public abstract class Authenticator {
      * @param password The password
      * @return Encrypted password
      */
-    public String getHashedPassword(String email, String password) {
+    public static String getHashedPassword(String email, String password) {
         MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-1");
@@ -104,6 +154,8 @@ public abstract class Authenticator {
     }
 
     protected static Logger logger = Logger.getLogger(Authenticator.class);
+    private static Authenticator authenticator;
     private static final HashMap<String, Session> sessions = new HashMap<String, Session>();
     private static final SecureRandom randomGenerator = new SecureRandom();
+    private static String passCharString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 }

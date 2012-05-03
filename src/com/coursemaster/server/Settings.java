@@ -6,8 +6,9 @@ import java.util.Properties;
 
 import org.apache.log4j.xml.DOMConfigurator;
 
-import com.coursemaster.auth.AuthenticationManager;
+import com.coursemaster.auth.Authenticator;
 import com.coursemaster.database.DatabaseConnectionManager;
+import com.coursemaster.servlet.util.EmailUtil;
 
 /**
  * A class representing this Server's settings.
@@ -22,12 +23,6 @@ public class Settings {
 
     // Web information
     public static int port;
-
-    // Database Config
-    public static DatabaseConnectionManager dbManager;
-
-    // Authentication Parts
-    public static String cookieName;
 
     /**
      * Method to load configuration settings
@@ -55,22 +50,26 @@ public class Settings {
         try {
             configProperties.load(new FileInputStream(new File(courseMasterDirectory + "settings" + FILESEPARATOR + "ServerSettings.properties")));
 
-            port = Integer.parseInt(configProperties.getProperty("port"));
+            port = Integer.parseInt(configProperties.getProperty("serverport"));
 
-            String authenticationMode = configProperties.getProperty("auth");
-            AuthenticationManager.init(authenticationMode);
-
-            // Load the cookie name
-            cookieName = configProperties.getProperty("cookie");
+            // Load Authentication configuration
+            String authenticationMode = configProperties.getProperty("authtype");
+            String authCookie = configProperties.getProperty("authcookie");
+            Authenticator.init(authenticationMode, authCookie);
 
             // Load Database configuration
-            String cmdb = configProperties.getProperty("cmdb");
+            String dbname = configProperties.getProperty("dbname");
             String dbloc = configProperties.getProperty("dblocation");
             String dbuser = configProperties.getProperty("dbuser");
             String dbpass = configProperties.getProperty("dbpass");
+            String dbConnector = configProperties.getProperty("dbconnector");
+            DatabaseConnectionManager.init(dbConnector, dbloc, dbname, dbuser, dbpass);
 
-            String dbConnector = configProperties.getProperty("connector");
-            DatabaseConnectionManager.init(dbConnector, dbloc, cmdb, dbuser, dbpass);
+            // Load Email Configuration
+            String emailhost = configProperties.getProperty("emailhost");
+            String emailuser = configProperties.getProperty("emailuser");
+            String emailpass = configProperties.getProperty("emailpass");
+            EmailUtil.init(emailhost, emailuser, emailpass);
         }
         catch(Exception e) {
             System.err.println("Failed to load configuration settings.");

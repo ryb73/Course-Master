@@ -36,7 +36,8 @@ public abstract class DatabaseConnectionManager {
             connectionString = String.format("jdbc:mysql://%s/%s", location, dbname);
         }
         else {
-            logger.fatal("Unrecognized database connector");
+            driver = connector;
+            logger.fatal("Unrecognized database connector. Database connectivity cannot be ensured.");
         }
 
         try {

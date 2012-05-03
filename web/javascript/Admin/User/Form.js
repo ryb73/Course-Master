@@ -31,10 +31,6 @@ Ext.define("CM.Admin.User.Form", {
                 allowBlank: false,
                 vtype: 'email'
             }, {
-                fieldLabel: 'Password',
-                name: 'password',
-                allowBlank: false
-            }, {
                 fieldLabel: 'Role',
                 name: 'role',
                 xtype: 'combobox',

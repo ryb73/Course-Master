@@ -11,7 +11,8 @@
             <h1>Welcome to Course Master!</h1>
         </div>
 
-        <br/><br/>
+        <div id='message-box'><br/></div>
+
         <form action="/action/login" method="POST">
             <div class="login-box">
                 <p>In order to access the content of the site, you must first login.</p>
@@ -34,4 +35,16 @@
             </div>
          </form>
     </body>
+
+    <script type='text/javascript'>
+        if (window.location.search.indexOf("unauthorized=true") > 0) {
+            document.getElementById('message-box').innerHTML = "<p style='color:red;'>The page you've requested requires a valid login.</p>";
+        }
+        else if (window.location.search.indexOf("logout=true") > 0) {
+            document.getElementById('message-box').innerHTML = "<p style='color:green;'>You were successfully logged out.</p>";
+        }
+        else if (window.location.search.indexOf("login=false") > 0) {
+            document.getElementById('message-box').innerHTML = "<p style='color:red;'>The system was unable to log you in with the specified credentials</p>";
+        }
+    </script>
 </html>

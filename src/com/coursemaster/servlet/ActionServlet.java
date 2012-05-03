@@ -11,9 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.coursemaster.auth.AuthenticationManager;
+import com.coursemaster.auth.Authenticator;
 import com.coursemaster.auth.Session;
-import com.coursemaster.server.Settings;
 import com.coursemaster.servlet.util.StringUtil;
 
 /**
@@ -102,14 +101,14 @@ public class ActionServlet extends HttpServlet {
 
         // Kill the cookie
         for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals(Settings.cookieName)) {
-                AuthenticationManager.authenticator.logout(cookie.getValue());
+            if (cookie.getName().equals(Authenticator.cookieName)) {
+                Authenticator.logout(cookie.getValue());
                 cookie.setMaxAge(-1);
                 response.addCookie(cookie);
             }
         }
 
-        response.sendRedirect("/login.html");
+        response.sendRedirect("/login.html?logout=true");
         response.addHeader("AUTHENTICATION", "Successfully logged out");
         response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
     }
@@ -124,19 +123,18 @@ public class ActionServlet extends HttpServlet {
         String email = request.getParameter("email"),
                password = request.getParameter("password");
 
-        if (email == null || email == "" ||
-            password == null || password == "") {
-            response.addHeader("Location", "/login.html");
+        if (email == null || email == "" || password == null || password == "") {
+            response.addHeader("Location", "/login.html?login=false");
             response.addHeader("FAILURE-REASON", "Both username and password are required to login");
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             return;
         }
 
         logger.trace("Attempting to create session for user: " + email);
-        Cookie sessionCookie = AuthenticationManager.authenticator.login(email, password);
+        Cookie sessionCookie = Authenticator.login(email, password);
 
         if (sessionCookie == null) {
-            response.addHeader("Location", "/login.html");
+            response.addHeader("Location", "/login.html?login=false");
             response.addHeader("FAILURE-REASON", "Failed to login with that username/password combination");
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             return;

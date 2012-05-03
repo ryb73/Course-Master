@@ -13,5 +13,11 @@
 	<classpathentry kind="lib" path="lib/log4j/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/mysql/mysql-connector-java-5.1.18.jar"/>
 	<classpathentry kind="lib" path="lib/json/json.jar"/>
+	<classpathentry kind="lib" path="lib/javamail/dsn.jar"/>
+	<classpathentry kind="lib" path="lib/javamail/imap.jar"/>
+	<classpathentry kind="lib" path="lib/javamail/mail.jar"/>
+	<classpathentry kind="lib" path="lib/javamail/mailapi.jar"/>
+	<classpathentry kind="lib" path="lib/javamail/pop3.jar"/>
+	<classpathentry kind="lib" path="lib/javamail/smtp.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

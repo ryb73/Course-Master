@@ -33,6 +33,7 @@ public class ResourceServlet extends HttpServlet {
      */
     public ResourceServlet() {
         resourceHandler = new ResourceHandler();
+        resourceHandler.setWelcomeFiles(new String[] { "login.html" });
         resourceHandler.setDirectoriesListed(false);
         resourceHandler.setCacheControl("no-store,no-cache,must-revalidate");
         resourceHandler.setResourceBase(Settings.courseMasterDirectory + "/web");

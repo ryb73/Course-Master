@@ -11,10 +11,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.coursemaster.auth.AuthenticationManager;
+import com.coursemaster.auth.Authenticator;
 import com.coursemaster.auth.Session;
 import com.coursemaster.auth.Session.Role;
 import com.coursemaster.database.DatabaseConnectionManager;
+import com.coursemaster.servlet.util.EmailUtil;
 
 public class User implements RestfulResponder {
 
@@ -40,19 +41,25 @@ public class User implements RestfulResponder {
                 // Pull off required parameters
                 String fullname = request.getParameter("fullname");
                 String email = request.getParameter("email");
-                String password = request.getParameter("password");
                 String role = request.getParameter("role");
 
                 // Ensure all required parameters are present
-                if (fullname == null || email == null || password == null || role == null) {
+                if (fullname == null || email == null || role == null) {
                     response.getWriter().write(PARAMS_MISSING_RESPONSE);
                 }
                 else {
-                    password = AuthenticationManager.authenticator.getHashedPassword(email, password);
+                    String password = Authenticator.generatePassword(),
+                    hashedPassword = Authenticator.getHashedPassword(email, password);
 
                     int res = DatabaseConnectionManager.executeInsert(String.format(
                             "insert into user (fullname, email, password, role)" +
-                            " values ('%s', '%s', '%s', %s);", fullname, email, password, role));
+                            " values ('%s', '%s', '%s', %s);", fullname, email, hashedPassword, role));
+ 
+                    // Send the user an email notifying them of their account creation
+                    EmailUtil.sendEmail(email, "Welcome to Course Master", String.format(
+                        "Hi %s,\n\nA Course Master Account has been created for you. You may log in using this email " +
+                        "and the password, %s, which was randomly generated for you. Reply to this message with any questions.\n\n" +
+                        "Thanks,\nThe Course Master Management", fullname, password));
 
                     // Check result value from database execution.
                     // Greater than 0 indicates success, less indicates failure.
@@ -171,8 +178,7 @@ public class User implements RestfulResponder {
                         // To update password, you must hash against email
                         if (password != null) {
                             userData.put("password",
-                                    AuthenticationManager.authenticator.getHashedPassword(
-                                            (String) userData.get("email"), password));
+                                    Authenticator.getHashedPassword((String) userData.get("email"), password));
                         }
 
                         if (role != null) { userData.put("role", role); }

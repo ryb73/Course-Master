@@ -14,8 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.coursemaster.auth.AuthenticationManager;
-import com.coursemaster.server.Settings;
+import com.coursemaster.auth.Authenticator;
 
 /**
  * This class filters all requests hitting the server. It is capable of
@@ -47,15 +46,15 @@ public class RequestVerifier implements Filter {
         // Users who request secure content without
         // a session are redirected to the login page
         if (!isInsecureRequest(requestURI) && !authenticated) {
-            httpResponse.sendRedirect("/login.html");
             httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            httpResponse.sendRedirect("/login.html?unauthorized=true");
             return;
         }
 
         // Send root requests to the dashboard,
         // as well as login page requests for users
         // who are already logged in.
-        if (requestURI.equals("/") || (requestURI.equals("/login.html") && authenticated)) {
+        if ((requestURI.equals("/") || requestURI.equals("/login.html")) && authenticated) {
             httpResponse.sendRedirect("/service/dashboard");
             return;
         }
@@ -72,7 +71,8 @@ public class RequestVerifier implements Filter {
      * @return Whether the request is for a secure resource
      */
     private boolean isInsecureRequest(String requestURI) {
-        return requestURI.toLowerCase().contains("login") ||
+        return requestURI.equals("/") ||
+               requestURI.toLowerCase().contains("login") ||
                requestURI.equals("/favicon.ico");
     }
 
@@ -85,15 +85,15 @@ public class RequestVerifier implements Filter {
      */
     private boolean containsCookie(HttpServletRequest request, HttpServletResponse response) {
         for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals(Settings.cookieName)) {
+            if (cookie.getName().equals(Authenticator.cookieName)) {
 
                 // If the cookie matches the server cookie, look
                 // for that cookie in the current list of sessions
-                if(AuthenticationManager.authenticator.hasSession(cookie.getValue())) {
-                    request.setAttribute("session", AuthenticationManager.authenticator.getSession(cookie.getValue()));
+                if(Authenticator.hasSession(cookie.getValue())) {
+                    request.setAttribute("session", Authenticator.getSession(cookie.getValue()));
                     return true;
                 }
-            
+
                 // If the user has a cookie that matches this servers cookie, but the
                 // server doesn't recognize the cookie, revoke the cookie
                 cookie.setMaxAge(0);
@@ -105,15 +105,12 @@ public class RequestVerifier implements Filter {
     }
 
     @Override
-    public void init(FilterConfig arg0) throws ServletException {
-        // TODO Auto-generated method stub
-        
-    }
+    // Not currently implemented
+    public void init(FilterConfig arg0) throws ServletException { }
 
     @Override
-    public void destroy() {
-        // TODO Auto-generated method stub
-    }
+    // Not currently implemented
+    public void destroy() { }
 
     private static Logger logger = Logger.getLogger(RequestVerifier.class);
 }

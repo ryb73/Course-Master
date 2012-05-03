@@ -14,4 +14,8 @@ Ext.onReady(function() {
             PageGlobals.contentPanel
         ]
     });
+
+    if (!Ext.firefoxVersion && !Ext.isChrome && !Ext.isIE) {
+        Ext.MessageBox.alert('Unsupported Browser Detected', 'The browser detected is not officially supported by Course Master.');
+    }
 });
