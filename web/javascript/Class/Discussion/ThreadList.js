@@ -5,10 +5,6 @@ Ext.define("CM.Discussion.ThreadList", {
 
         var topics = Ext.create('Ext.data.Store', {
             fields: [ 'id', 'name', 'postedBy', 'postedOn', 'replies' ],
-            /*data: [
-                { id: 1, name: '<a href="#topic=1">Topic 1</a>', postedBy: 'Ryan', postedOn: "2 days ago", replies: 0 },
-                { id: 2, name: '<a href="#topic=2">Topic 2</a>', postedBy: 'Rohit', postedOn: "5 days ago", replies: 2 }
-            ]*/
             proxy: {
                 type: 'ajax',
                 url: '/service/discussion/get-topics',
@@ -36,15 +32,19 @@ Ext.define("CM.Discussion.ThreadList", {
             columns: {
                 items: [{
                     text: 'Name',
+                    flex: 1,
                     dataIndex: 'name'
                 }, {
                     text: 'Posted By',
+                    width: 100,
                     dataIndex: 'postedBy'
                 }, {
                     text: 'On',
+                    width: 200,
                     dataIndex: 'postedOn'
                 }, {
                     text: 'Replies',
+                    width: 50,
                     dataIndex: 'replies'
                 }],
                 defaults: {
@@ -56,9 +56,33 @@ Ext.define("CM.Discussion.ThreadList", {
             }
         });
         
+        Ext.apply(this, {
+            dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                items: [
+                    {
+                        xtype: 'button',
+                        text: 'Create Topic',
+                        instance: this,
+                        listeners: { click: this.createTopic }
+                    }
+                ]
+            }]
+        });
+        
         this.callParent(arguments);
     },
-    
+
+    createTopic: function(view, record) {
+        if (!PageGlobals.contentPanel.getChildByElement(this.class + "-create-topic")) {
+            PageGlobals.contentPanel.add(new CM.Discussion.CreateTopic({ class: this.class, courseId: this.courseId, boardId: this.instance.boardId }));
+        }
+
+        PageGlobals.contentPanel.getLayout().setActiveItem(this.class + '-create-topic');
+    },
+
     onSelect: function(rowModel, record) {
         console.log("Select fired: " + record.get("id"));
     },

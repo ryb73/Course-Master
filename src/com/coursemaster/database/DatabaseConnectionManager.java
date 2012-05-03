@@ -97,14 +97,15 @@ public abstract class DatabaseConnectionManager {
         try {
             Connection conn = getConnection();
             Statement stmt = conn.createStatement();
-            stmt.execute(sqlInsert);
+            stmt.execute(sqlInsert, Statement.RETURN_GENERATED_KEYS);
+
+            ResultSet result = stmt.getGeneratedKeys();
+            result.first();
+            return result.getInt(1);
         } catch (SQLException e) {
             logger.error("An exception was thrown while processing a query: " + e.getMessage());
             return -1;
         }
-
-        // TODO Return newly create ID
-        return 1;
     }
 
     /**
@@ -172,7 +173,7 @@ public abstract class DatabaseConnectionManager {
                 if (count >= start && count < limit) {
                     Map<String, Object> row = new HashMap<String, Object>();
                     for (int i = 1; i <= numColumns; i++) {
-                        row.put(rsmd.getColumnName(i), res.getObject(i));
+                        row.put(rsmd.getColumnLabel(i), res.getObject(i));
                     }
                     data.add(row);
                 }

@@ -24,7 +24,7 @@ public class MockAuthenticator extends Authenticator {
      * @param password Unused
      * @return A session cookie
      */
-    public Cookie login(String email, String password) {
+    public Cookie doLogin(String email, String password) {
         return generateSession(0, email, email, Role.STUDENT);
     }
 }
