@@ -108,7 +108,7 @@ public class Discussion extends AbstractService {
         		"from discussion_post post " +
         		"join user owner on owner.id = post.owner " +
         		"where post.parent = %s",
-        		request.getParameter("topic"));
+        		request.getParameter("topicId"));
         JSONObject rsp = DatabaseConnectionManager.executeQuery(query);
 
         response.setStatus(HttpServletResponse.SC_OK);

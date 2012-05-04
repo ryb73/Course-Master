@@ -26,7 +26,9 @@ Ext.define("CM.Discussion.CreateTopic", {
                     xtype: 'textarea',
                     name: 'message',
                     fieldLabel: 'Message',
-                    anchor: '100% 90%'
+                    anchor: '100% 90%',
+                    maxLength: 1024,
+                    enforceMaxLength: true
                 },{
                     xtype: 'hidden',
                     name: 'board',

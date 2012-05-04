@@ -51,18 +51,11 @@ Ext.define('CM.Discussion.Root', {
 
         if(SessionGlobals.role == 2) {
             Ext.apply(this, {
-                dockedItems: [{
-                    xtype: 'toolbar',
-                    dock: 'bottom',
-                    ui: 'footer',
-                    items: [
-                        {
-                            xtype: 'button',
-                            text: 'Add Board',
-                            instance: this,
-                            listeners: { click: this.addBoard }
-                        }
-                    ]
+                bbar: [{
+                    xtype: 'button',
+                    text: 'Add Board',
+                    instance: this,
+                    listeners: { click: this.addBoard }
                 }]
             });
         }
