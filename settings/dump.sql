@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.5.21, for Win64 (x86)
 --
--- Host: localhost    Database: coursemasterdb
+-- Host: localhost    Database: CourseMasterDB
 -- ------------------------------------------------------
 -- Server version	5.5.21
 
@@ -272,7 +272,7 @@ CREATE TABLE `user` (
   `password` varchar(256) NOT NULL,
   `role` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE (`email`)
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
