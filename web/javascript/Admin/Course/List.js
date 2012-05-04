@@ -24,7 +24,7 @@ Ext.define("CM.Admin.Course.List", {
                     encode: true
                 })
             },
-            fields: [ 'id', 'name', 'fullname', 'dept', 'num', 'sect', 'cred', 'sem' ]
+            fields: [ 'id', 'name', 'prof', 'dept', 'num', 'sect', 'cred', 'sem' ]
         });
 
         Ext.apply(this, {
@@ -38,7 +38,7 @@ Ext.define("CM.Admin.Course.List", {
                 flex: 1
             }, {
                 header: 'Professor',
-                dataIndex: 'fullname',
+                dataIndex: 'prof',
                 flex: 1
             }, {
                 header: 'Department',
