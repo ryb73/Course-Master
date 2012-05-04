@@ -24,11 +24,27 @@ Ext.define("CM.Class.Dashboard", {
             autoLoad: true
         });
 
+        var calStore = new Extensible.calendar.data.MemoryCalendarStore({
+            proxy: {
+                type: 'ajax',
+                url : '/service/courses',
+                extraParams: {
+                    userId: SessionGlobals.id
+                },
+                autoLoad: true,
+                reader: {
+                    type: 'json',
+                    root: 'data'
+                }
+            }
+        });
+
         Ext.apply(this, {
             title: 'Dashboard',
             border: false,
             id: "Dashboard-panel",
-            eventStore: eventStore
+            eventStore: eventStore,
+            calendarStore: calStore
         });
 
         this.callParent(arguments);

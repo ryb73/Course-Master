@@ -7,7 +7,7 @@ Ext.define("CM.Sidebar.Panel", {
         ];
 
         if (SessionGlobals.role != 3) {
-            var classStore = new Ext.data.Store({
+            SessionGlobals.courses = new Ext.data.Store({
                 proxy: {
                     type: 'ajax',
                     url : '/service/courses',
@@ -20,10 +20,10 @@ Ext.define("CM.Sidebar.Panel", {
                     }
                 },
                 autoLoad: true,
-                fields: [ 'id', 'name', 'prof', 'dept', 'num', 'sec', 'cred', 'sem' ]
+                fields: [ 'id', 'dept', 'num' ]
             });
 
-            classStore.on('load', this.onLoad, this);
+            SessionGlobals.courses.on('load', this.onLoad, this);
         }
         else {
             panelButtons.push([

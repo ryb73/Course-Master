@@ -29,7 +29,7 @@ public class CreateEvent extends AbstractService {
 
             DatabaseConnectionManager.executeInsert(String.format(
                "insert into event (name, descr, start, end, disp, owner, course, type)" +
-              " values ('%s', '%s', '%s', '%s', NOW(), %s, 0, 1);",
+              " values ('%s', '%s', '%s', '%s', NOW(), %s, %s, 1);",
             name, descr, start, end, userId, course));
         } catch (JSONException e) { }
     }

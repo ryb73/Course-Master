@@ -703,25 +703,41 @@ var reader = new Ext.data.JsonReader({
 Ext.ns('Extensible.calendar.data');
 
 Extensible.calendar.data.CalendarMappings = {
+
     CalendarId: {
         name:    'CalendarId',
         mapping: 'id',
         type:    'int'
     },
+    Number: {
+        name:    'Number',
+        mapping: 'num',
+        type:    'int'
+    },
+    Deptartment: {
+        name:    'Department',
+        mapping: 'dept',
+        type:    'string'
+    },
     Title: {
         name:    'Title',
-        mapping: 'title',
-        type:    'string'
+        type:    'string',
+        convert: function(v, rec) {
+            return rec.data.Department + '-' +rec.data.Number;
+        }
     },
     Description: {
         name:    'Description', 
-        mapping: 'desc',   
-        type:    'string' 
+        mapping: 'name',
+        type:    'string'
     },
     ColorId: {
         name:    'ColorId',
-        mapping: 'color',
-        type:    'int'
+        //mapping: 'id',
+        type:    'int',
+        convert: function(v, rec) {
+            return rec.data.CalendarId;
+        }
     },
     IsHidden: {
         name:    'IsHidden',
@@ -5340,7 +5356,7 @@ Ext.define('Extensible.calendar.form.EventWindow', {
                 xtype: 'extensible.calendarcombo',
                 itemId: this.id + '-calendar',
                 name: Extensible.calendar.data.EventMappings.CalendarId.name,
-                anchor: '100%',
+                anchor: '95%',
                 fieldLabel: this.calendarLabelText,
                 store: this.calendarStore
             });
