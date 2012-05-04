@@ -5,6 +5,15 @@
 
         <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
         <link rel="stylesheet" type="text/css" href="/stylesheet/LoginPage.css" />
+        <script type="text/javascript">
+            function addUwm(form) {
+                if(!form.elements["email"].value.match('@')) {
+                    form.elements["email"].value += "@uwm.edu";
+                }
+            }
+
+			window.onload = function() { document.forms[0].elements["email"].focus(); };
+        </script>
     </head>
     <body>
         <div class="header">
@@ -13,7 +22,7 @@
 
         <div id='message-box'><br/></div>
 
-        <form action="/action/login" method="POST">
+        <form action="/action/login" method="POST" onsubmit="addUwm(this)">
             <div class="login-box">
                 <p>In order to access the content of the site, you must first login.</p>
 

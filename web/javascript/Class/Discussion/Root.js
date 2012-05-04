@@ -5,10 +5,6 @@ Ext.define('CM.Discussion.Root', {
 
         var discussionBoards = Ext.create('Ext.data.Store', {
             fields: [ 'name', 'topicCount', 'id' ],
-            /*data: [
-                { id: '1', name: 'Board 1', postCount: 12 },
-                { id: '2', name: 'Board 2', postCount: 3 }
-            ]*/
             proxy: {
                 type: 'ajax',
                 url: '/service/discussion/get-boards',
@@ -55,18 +51,11 @@ Ext.define('CM.Discussion.Root', {
 
         if(SessionGlobals.role == 2) {
             Ext.apply(this, {
-                dockedItems: [{
-                    xtype: 'toolbar',
-                    dock: 'bottom',
-                    ui: 'footer',
-                    items: [
-                        {
-                            xtype: 'button',
-                            text: 'Add Board',
-                            instance: this,
-                            listeners: { click: this.addBoard }
-                        }
-                    ]
+                bbar: [{
+                    xtype: 'button',
+                    text: 'Add Board',
+                    instance: this,
+                    listeners: { click: this.addBoard }
                 }]
             });
         }
@@ -79,7 +68,11 @@ Ext.define('CM.Discussion.Root', {
     },
 
     onItemDblClick: function(view, record) {
-        console.log("Double clicked: " + record.get("id"));
+        if (!PageGlobals.contentPanel.getChildByElement(this.class + "-thread-list")) {
+            PageGlobals.contentPanel.add(new CM.Discussion.ThreadList({ class: this.class, courseId: this.courseId, boardId: record.get("id"), boardName: record.get("name") }));
+        }
+
+        PageGlobals.contentPanel.getLayout().setActiveItem(this.class + '-thread-list');
     },
 
     addBoard: function() {

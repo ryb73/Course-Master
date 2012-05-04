@@ -18,7 +18,7 @@
 --
 -- Table structure for table `course`
 --
-
+use coursemasterdb;
 DROP TABLE IF EXISTS `course`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -85,14 +85,14 @@ DROP TABLE IF EXISTS `discussion_post`;
 CREATE TABLE `discussion_post` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `owner` int(11) NOT NULL,
-  `parent` int(11) NOT NULL,
+  `parent` int(11) NULL,
   `dte` datetime NOT NULL,
   `content` varchar(1024) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   KEY `parent` (`parent`),
   CONSTRAINT `discussion_post_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `user` (`id`),
-  CONSTRAINT `discussion_post_ibfk_2` FOREIGN KEY (`parent`) REFERENCES `discussion_post` (`id`)
+  CONSTRAINT `discussion_post_ibfk_2` FOREIGN KEY (`parent`) REFERENCES `discussion_topic` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
