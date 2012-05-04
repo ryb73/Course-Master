@@ -15,7 +15,9 @@
         <!-- Course Master Files -->
         <link rel="stylesheet" type="text/css" href="/stylesheet/Main.css" />
         <script type="text/javascript" src="/javascript/Admin/User/Form.js"></script>
+        <script type="text/javascript" src="/javascript/Admin/User/List.js"></script>
         <script type="text/javascript" src="/javascript/Admin/Course/Form.js"></script>
+        <script type="text/javascript" src="/javascript/Admin/Course/List.js"></script>
 
         <script type="text/javascript" src="/javascript/Class/Home.js"></script>
         <script type="text/javascript" src="/javascript/Class/Dashboard.js"></script>

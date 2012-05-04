@@ -5535,7 +5535,9 @@ Ext.define('Extensible.calendar.form.EventWindow', {
 //    },
     
     updateRecord: function(record, keepEditing) {
-        if (record.data[Extensible.calendar.data.EventMappings.Owner.name] != SessionGlobals.id) {
+        // If it has an ID (not a new record) and it's not equal to the current user
+        if (record.data[Extensible.calendar.data.EventMappings.Owner.name] &&
+            record.data[Extensible.calendar.data.EventMappings.Owner.name] != SessionGlobals.id) {
             return;
         }
 

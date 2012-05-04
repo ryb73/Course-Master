@@ -5,6 +5,8 @@ Ext.onReady(function() {
     };
 
     PageGlobals.sidebarPanel = new CM.Sidebar.Panel({ region: 'west' });
+    PageGlobals.contentPanel.add(new CM.Admin.User.List());
+    PageGlobals.contentPanel.add(new CM.Admin.Course.List());
 
     Ext.create('Ext.container.Viewport', {
         layout: 'border',

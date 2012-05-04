@@ -58,6 +58,9 @@ Ext.define("CM.Admin.Course.Form", {
                 allowBlank: false
             }],
             buttons: [{
+                text: 'Cancel',
+                handler: this.returnToList
+            }, {
                 text: 'Submit',
                 formBind: true,
                 disabled: true,
@@ -67,6 +70,7 @@ Ext.define("CM.Admin.Course.Form", {
                         form.submit({
                             success: function(form, action) {
                                Ext.Msg.alert('Success', 'The course was successfully added');
+                               form.owner.returnToList();
                             },
                             failure: function(form, action) {
                                 Ext.Msg.alert('Failed', action.result.errors.message);
@@ -78,5 +82,9 @@ Ext.define("CM.Admin.Course.Form", {
         });
 
         this.callParent(arguments);
+    },
+
+    returnToList: function() {
+        PageGlobals.contentPanel.getLayout().setActiveItem('Course-List-panel');
     }
 });

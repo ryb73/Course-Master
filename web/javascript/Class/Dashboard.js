@@ -18,8 +18,7 @@ Ext.define("CM.Class.Dashboard", {
                 },
                 writer: new Ext.data.JsonWriter({
                     root: 'data',
-                    encode: true,
-                    writeAllFields: true
+                    encode: true
                 })
             },
             autoLoad: true

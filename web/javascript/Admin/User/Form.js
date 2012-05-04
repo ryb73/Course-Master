@@ -41,6 +41,9 @@ Ext.define("CM.Admin.User.Form", {
                 allowBlank: false
             }],
             buttons: [{
+                text: 'Cancel',
+                handler: this.returnToList
+            }, {
                 text: 'Submit',
                 formBind: true,
                 disabled: true,
@@ -50,6 +53,7 @@ Ext.define("CM.Admin.User.Form", {
                         form.submit({
                             success: function(form, action) {
                                Ext.Msg.alert('Success', 'Your entry was successfully stored.');
+                               form.owner.returnToList();
                             },
                             failure: function(form, action) {
                                 Ext.Msg.alert('Failed', action.result.errors.message);
@@ -61,5 +65,9 @@ Ext.define("CM.Admin.User.Form", {
         });
 
         this.callParent(arguments);
+    },
+
+    returnToList: function() {
+        PageGlobals.contentPanel.getLayout().setActiveItem('User-List-panel');
     }
 });

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,6 +72,7 @@ public class User implements RestfulResponder {
     @Override
     public void delete(HttpServletRequest request, HttpServletResponse response) {
         logger.trace("Attempting to remove a user");
+
         try {
             response.setStatus(HttpServletResponse.SC_OK);
             Session session = (Session) request.getAttribute("session");
@@ -82,7 +82,7 @@ public class User implements RestfulResponder {
                 response.getWriter().write(UNAUTHORIZED_RESPONSE);
             }
             else {
-                String id = request.getParameter("id");
+                String id = new JSONObject(request.getParameter("data")).getString("id");
 
                 // Requires id, can't delete self
                 if (id == null || String.valueOf(session.getId()).equals(id)) {
@@ -96,40 +96,34 @@ public class User implements RestfulResponder {
             }
         }
         catch (IOException ioe) { }
+        catch (JSONException e) { }
     }
 
     @Override
-    public void read(HttpServletRequest request, HttpServletResponse response) {
+    public void get(HttpServletRequest request, HttpServletResponse response) {
         logger.trace("Attempting to retrieve users");
 
-        boolean allMode = request.getRequestURI().endsWith("/all");
+        String idString = request.getParameter("id");
         Session session = (Session) request.getAttribute("session");
 
         try {
             response.setStatus(HttpServletResponse.SC_OK);
 
-            if (!allMode) {
-                // If all mode isn't specified, id is expected
-                String idString = request.getParameter("id");
-
-                // Report failures if missing
-                if (idString == null) {
-                    response.getWriter().write(PARAMS_MISSING_RESPONSE);
-                }
+            // No ID indicates an ALL request
+            if (idString != null) {
                 // Otherwise, parse to integer
+               int id = Integer.parseInt(idString);
+                // If the current user isn't an administrator, but is requesting
+                // another user's information, we mark that as unauthorized
+                if (session.getId() != id && !session.getRole().equals(Role.ADMIN)) {
+                    response.getWriter().write(UNAUTHORIZED_RESPONSE);
+                }
                 else {
-                    int id = Integer.parseInt(idString);
-                    // If the current user isn't an administrator, but is requesting
-                    // another user's information, we mark that as unauthorized
-                    if (session.getId() != id && !session.getRole().equals(Role.ADMIN)) {
-                        response.getWriter().write(UNAUTHORIZED_RESPONSE);
-                    }
-                    else {
-                        JSONObject rspObj = DatabaseConnectionManager.executeQuery("select id, fullname, email, role from user where id = " + id);
-                        response.getWriter().write(rspObj == null ? DATABASE_FAILURE_RESPONSE : rspObj.toString());
-                    }
+                    JSONObject rspObj = DatabaseConnectionManager.executeQuery("select id, fullname, email, role from user where id = " + id);
+                    response.getWriter().write(rspObj == null ? DATABASE_FAILURE_RESPONSE : rspObj.toString());
                 }
             }
+
             // Non-admins can't view all
             else if(!session.getRole().equals(Role.ADMIN)) {
                 response.getWriter().write(UNAUTHORIZED_RESPONSE);
@@ -197,10 +191,4 @@ public class User implements RestfulResponder {
         catch (IOException ioe) { }
         catch (JSONException e) { }
     }
-
-    private static final String BASIC_SUCCESS_RESPONSE    = "{ success: true }";
-    private static final String UNAUTHORIZED_RESPONSE     = "{ success: false, errors: { message: 'You are not authorized to perform this operation' }}";
-    private static final String PARAMS_MISSING_RESPONSE   = "{ success: false, errors: { message: 'Missing one or more required fields' }}";
-    private static final String DATABASE_FAILURE_RESPONSE = "{ success: false, errors: { message: 'An error occured while interacting with the database. See logs for details.' }}";
-    private static Logger logger = Logger.getLogger(User.class);
 }

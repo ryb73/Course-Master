@@ -27,8 +27,8 @@ Ext.define("CM.Sidebar.Panel", {
         }
         else {
             panelButtons.push([
-                new CM.Sidebar.Button({ class: 'User Form' }),
-                new CM.Sidebar.Button({ class: 'Course Form' })
+                new CM.Sidebar.Button({ class: 'User List' }),
+                new CM.Sidebar.Button({ class: 'Course List' })
             ]);
         }
 
