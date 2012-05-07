@@ -83,7 +83,7 @@ Ext.define("CM.Discussion.ThreadList", {
     onItemDblClick: function(view, record) {
         if (!PageGlobals.contentPanel.getChildByElement(this.class + "-topic" + record.get("id"))) {
             PageGlobals.contentPanel.add(new CM.Discussion.Topic({ class: this.class, courseId: this.courseId, boardId: this.boardId, boardName: this.boardName,
-                topicId: record.get("id"), topicName: record.get("name") }));
+                topicId: record.get("id"), topicName: record.get("name"), newPost: false }));
         }
 
         var blah = this.class + "-topic" + record.get("id");

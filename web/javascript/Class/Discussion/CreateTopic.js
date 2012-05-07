@@ -52,7 +52,7 @@ Ext.define("CM.Discussion.CreateTopic", {
         if(form.isValid()) {
             form.submit({
                 success: function() { Ext.Msg.alert("success","success"); },
-                failure: function() { Ext.Msg.alert("Error","Unable to add discussion board."); }
+                failure: function() { Ext.Msg.alert("Error","Unable to create topic. Try refreshing the page."); }
             });
         }
     },
