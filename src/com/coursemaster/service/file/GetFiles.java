@@ -10,10 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.coursemaster.auth.Session;
-import com.coursemaster.auth.Session.Role;
 import com.coursemaster.database.DatabaseConnectionManager;
 import com.coursemaster.service.AbstractService;
-import com.coursemaster.servlet.util.FileUtil;
 
 public class GetFiles extends AbstractService {
     @Override
@@ -22,9 +20,7 @@ public class GetFiles extends AbstractService {
         String courseId = request.getParameter("courseId");
         String fId = request.getParameter("fId");
 
-        JSONObject rsp = DatabaseConnectionManager.executeQuery(String.format(
-                "select id, folder, path, name, owner, dte " +
-                "from submission "));
+        JSONObject rsp = DatabaseConnectionManager.executeQuery("select id, folder, path, name, owner, dte from submission ");
 
         try {
             if (rsp == null) {
