@@ -40,63 +40,91 @@ Ext.define("CM.Discussion.Topic", {
                     var postItems = new Array(postCount);
                     for(var i = 0; i < postCount; ++i) {
                         var record = posts.getAt(i);
+
+                        var owner = record.get("owner");
+                        var ownerName = record.get("ownerName");
+                        var dte = record.get("dte");
+                        var postId = record.get("id");
+                        var content = record.get("content");
+
                         postItems[i] = {
                             xtype: 'form',
                             url: (i == 0) ? '/service/discussion/delete-topic' : '/service/discussion/delete-post',
                             instance: this,
-                            title: 'Posted by ' + record.get("ownerName") + ' at ' + record.get("dte"),
+                            title: 'Posted by ' + ownerName + ' at ' + dte,
                             padding: 10,
                             margin: '0 10px 0 0',
                             items: [{
                                 border: false,
                                 padding: 10,
-                                html: record.get("content")
+                                html: content.replace(/\n/g, "<br />"),
+                                id: 'post' + postId
                             },{
                                 xtype: 'hidden',
                                 name: 'postId',
-                                value: record.get("id")
+                                value: postId
                             }],
                         };
 
-                        if(record.get("owner") == SessionGlobals.id || SessionGlobals.role == 2) {
-                            Ext.apply(postItems[i], {
-                                bbar: [{
-                                    xtype: 'button',
-                                    text: 'Delete',
-                                    handler: (i == 0) ? this.deleteTopic : this.deletePost
-                                }]
-                            });
+                        var bbar = [];
+
+                        if(owner == SessionGlobals.id) {
+                            bbar[bbar.length] = {
+                                xtype: 'button',
+                                text: 'Modify',
+                                id: 'modify' + postId,
+                                postId: postId,
+                                content: content,
+                                handler: this.modifyPost
+                            };
+                        }
+
+                        if(owner == SessionGlobals.id || SessionGlobals.role == 2) {
+                            bbar[bbar.length] = {
+                                xtype: 'button',
+                                text: 'Delete',
+                                id: 'delete' + postId,
+                                handler: (i == 0) ? this.deleteTopic : this.deletePost
+                            };
+                        }
+
+                        if(bbar.length > 0) {
+                            Ext.apply(postItems[i], { bbar: bbar });
                         }
                     }
 
                     this.add(postItems);
-                    this.add({
-                        xtype: 'form',
-                        url: '/service/discussion/post-reply',
-                        title: 'Post Reply',
-                        padding: 10,
-                        margin: '0 10px 0 0',
-                        layout: 'fit',
-                        instance: this,
-                        items: [{
-                            xtype: 'textarea',
-                            name: 'message',
-                            padding: 5,
-                            margin: '0 5px 0 0',
-                            grow: true,
-                            maxLength: 1024,
-                            enforceMaxLength: true
-                        },{
-                            xtype: 'hidden',
-                            name: 'topicId',
-                            value: this.topicId
-                        }],
-                        bbar: [{
-                            xtype: 'button',
-                            text: 'Post',
-                            handler: this.postReply
-                        }]
-                    });
+
+                    if(this.boardStatus != 3 /* Closed */) {
+                        this.add({
+                            xtype: 'form',
+                            url: '/service/discussion/post-reply',
+                            title: 'Post Reply',
+                            padding: 10,
+                            margin: '0 10px 0 0',
+                            layout: 'fit',
+                            instance: this,
+                            items: [{
+                                xtype: 'textarea',
+                                name: 'message',
+                                padding: 5,
+                                margin: '0 5px 0 0',
+                                grow: true,
+                                maxLength: 1024,
+                                enforceMaxLength: true,
+                                allowBlank: false
+                            },{
+                                xtype: 'hidden',
+                                name: 'topicId',
+                                value: this.topicId
+                            }],
+                            bbar: [{
+                                xtype: 'button',
+                                text: 'Post',
+                                handler: this.postReply
+                            }]
+                        });
+                    }
 
                     Ext.getBody().down("div#" + this.id+"-body").down("div.x-box-inner").setStyle("overflow-y","auto");
                     if(this.newPost)
@@ -114,8 +142,8 @@ Ext.define("CM.Discussion.Topic", {
             form.submit({
                 success: function() {
                     var newPanel = new CM.Discussion.Topic({ class: form.instance.class, courseId: form.instance.courseId, boardId: form.instance.boardId,
-                        boardName: form.instance.boardName, topicId: form.instance.topicId, topicName: form.instance.topicName, newPost: true });
-                    form.instance.destroy();
+                        boardName: form.instance.boardName, boardStatus: form.instance.boardStatus, topicId: form.instance.topicId,
+                        topicName: form.instance.topicName, newPost: true });form.instance.destroy();
                     PageGlobals.contentPanel.add(newPanel);
                     PageGlobals.contentPanel.getLayout().setActiveItem(newPanel.class + "-topic" + newPanel.topicId);
                 },
@@ -165,5 +193,63 @@ Ext.define("CM.Discussion.Topic", {
                 }
             }
         }, this);
-    }
+    },
+
+    modifyPost: function() {
+        var form = this.up('form');
+
+        form.add({
+            xtype: 'form',
+            url: '/service/discussion/modify-post',
+            border: false,
+            layout: 'fit',
+            instance: form.instance,
+            items: [{
+                xtype: 'textarea',
+                name: 'message',
+                padding: 5,
+                margin: '0 5px 0 0',
+                grow: true,
+                maxLength: 1024,
+                enforceMaxLength: true,
+                allowBlank: false,
+                value: this.content
+            },{
+                xtype: 'hidden',
+                name: 'postId',
+                value: this.postId
+            }],
+            bbar: [{
+                xtype: 'button',
+                text: 'Save',
+                handler: form.instance.saveModification
+            }]
+        });
+
+        Ext.get('post' + this.postId).destroy();
+        var dockedItems = form.getDockedItems("");
+        for(var i = 0; i < dockedItems.length; ++i) {
+            if(dockedItems[i].dock == "bottom") {
+                form.removeDocked(dockedItems[i], true);
+            }
+        }
+    },
+
+    saveModification: function() {
+        var form = this.up('form');
+        if(form.getForm().isValid()) {
+            form.submit({
+                success: function() {
+                    var newPanel = new CM.Discussion.Topic({ class: form.instance.class, courseId: form.instance.courseId, boardId: form.instance.boardId,
+                        boardName: form.instance.boardName, boardStatus: form.instance.boardStatus, topicId: form.instance.topicId,
+                        topicName: form.instance.topicName, newPost: false });
+                    form.instance.destroy();
+                    PageGlobals.contentPanel.add(newPanel);
+                    PageGlobals.contentPanel.getLayout().setActiveItem(newPanel.class + "-topic" + newPanel.topicId);
+                    Ext.Msg.alert("Success", "Your post has been modified.");
+                },
+                failure: function() { Ext.Msg.alert("Error", "Unable to modify post. Try refreshing the page."); }
+            });
+        }
+     }
 });

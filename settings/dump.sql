@@ -182,7 +182,8 @@ CREATE TABLE `discussion_topic` (
   `board` int(11) NOT NULL,
   `root` int(11) NOT NULL,
   `name` varchar(256) NOT NULL,
-  `status` int(11) NOT NULL,
+  `start` datetime NULL,
+  `end` datetime NULL,
   PRIMARY KEY (`id`),
   KEY `board` (`board`),
   KEY `root` (`root`),
@@ -197,7 +198,7 @@ CREATE TABLE `discussion_topic` (
 
 LOCK TABLES `discussion_topic` WRITE;
 /*!40000 ALTER TABLE `discussion_topic` DISABLE KEYS */;
-INSERT INTO `discussion_topic` VALUES (1,2,1,'poiu',1);
+INSERT INTO `discussion_topic` VALUES (1,2,1,'poiu',null,null);
 /*!40000 ALTER TABLE `discussion_topic` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -53,27 +53,34 @@ Ext.define("CM.Discussion.ThreadList", {
                     hideable: false,
                     sortable: false
                 }
-            }
+            },
+            viewConfig: { emptyText: "There are no topics in this discussion board." }
         });
-        
-        Ext.apply(this, {
-            bbar: [{
-                xtype: 'button',
-                text: 'Create Topic',
-                instance: this,
-                listeners: { click: this.createTopic }
-            }]
-        });
+
+        if(this.boardStatus == 1 /* Open */ || SessionGlobals.role == 2 /* Professor */) {
+            Ext.apply(this, {
+                bbar: [{
+                    xtype: 'button',
+                    text: 'Create Topic',
+                    instance: this,
+                    listeners: { click: this.createTopic }
+                }]
+            });
+        }
         
         this.callParent(arguments);
     },
 
     createTopic: function(view, record) {
-        if (!PageGlobals.contentPanel.getChildByElement(this.class + "-create-topic")) {
-            PageGlobals.contentPanel.add(new CM.Discussion.CreateTopic({ class: this.class, courseId: this.courseId, boardId: this.instance.boardId }));
+        var createTopicPanel = PageGlobals.contentPanel.getChildByElement("create-topic");
+        if (createTopicPanel) {
+            createTopicPanel.destroy();
         }
 
-        PageGlobals.contentPanel.getLayout().setActiveItem(this.class + '-create-topic');
+        PageGlobals.contentPanel.add(new CM.Discussion.CreateTopic({ class: this.instance.class, courseId: this.instance.courseId, boardId: this.instance.boardId,
+            boardName: this.instance.boardName}));
+
+        PageGlobals.contentPanel.getLayout().setActiveItem('create-topic');
     },
 
     onSelect: function(rowModel, record) {
@@ -83,10 +90,9 @@ Ext.define("CM.Discussion.ThreadList", {
     onItemDblClick: function(view, record) {
         if (!PageGlobals.contentPanel.getChildByElement(this.class + "-topic" + record.get("id"))) {
             PageGlobals.contentPanel.add(new CM.Discussion.Topic({ class: this.class, courseId: this.courseId, boardId: this.boardId, boardName: this.boardName,
-                topicId: record.get("id"), topicName: record.get("name"), newPost: false }));
+                boardStatus: this.boardStatus, topicId: record.get("id"), topicName: record.get("name"), newPost: false }));
         }
 
-        var blah = this.class + "-topic" + record.get("id");
         PageGlobals.contentPanel.getLayout().setActiveItem(this.class + "-topic" + record.get("id"));
     }
 });
