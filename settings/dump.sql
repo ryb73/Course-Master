@@ -237,7 +237,7 @@ DROP TABLE IF EXISTS `submission`;
 CREATE TABLE `submission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `folder` int(11) NOT NULL,
-  `path` int(11) NOT NULL,
+  `path` varchar(128) NOT NULL,
   `name` varchar(128) NOT NULL,
   `owner` int(11) NOT NULL,
   `dte` datetime NOT NULL,
