@@ -3,9 +3,26 @@ Ext.define("CM.Discussion.CreateTopic", {
 
 	initComponent: function() {
 
+        if(SessionGlobals.role == 2 /* Professor */) {
+            this.hasDateRange = true;
+            this.openRange = Ext.create('Extensible.form.field.DateRange', {
+                fieldLabel: 'Date range',
+                name: 'open-range',
+                singleLine: true,
+                anchor: '100%'
+            });
+        } else {
+            this.hasDateRange = false;
+            this.openRange = {
+                xtype: 'hidden',
+                name: 'dummy',
+                value: 'i don\'t care'
+            };
+        }
+
         Ext.apply(this, {
             border: false,
-            id: this.class + '-create-topic',
+            id: 'create-topic',
             title: 'Create Topic',
             layout: 'fit',
             items: {
@@ -13,6 +30,11 @@ Ext.define("CM.Discussion.CreateTopic", {
                 url: '/service/discussion/post-topic',
                 border: false,
                 bodyPadding: 5,
+                instance: this,
+                // layout: {
+                    // type: 'table',
+                    // columns: 4
+                // },
                 fieldDefaults: {
                     //labelAlign: 'left',
                     //labelWidth: 90
@@ -21,14 +43,24 @@ Ext.define("CM.Discussion.CreateTopic", {
                     xtype: 'textfield',
                     name: 'topic-name',
                     fieldLabel: 'Topic Name',
-                    anchor: '100%'
-                },{
+                    anchor: '100%',
+                    allowBlank: false,
+                },
+                this.openRange,
+                {
+                    xtype: 'hidden',
+                    name: 'start-date'
+                }, {
+                    xtype: 'hidden',
+                    name: 'end-date'
+                }, {
                     xtype: 'textarea',
                     name: 'message',
                     fieldLabel: 'Message',
                     anchor: '100% 90%',
                     maxLength: 1024,
-                    enforceMaxLength: true
+                    enforceMaxLength: true,
+                    allowBlank: false
                 },{
                     xtype: 'hidden',
                     name: 'board',
@@ -47,17 +79,42 @@ Ext.define("CM.Discussion.CreateTopic", {
         this.callParent(arguments);
     },
 
+    dateToString: function(date) {
+        if(!date) return null;
+        var str = date.getFullYear().toString() + '-' +
+                  (date.getMonth() + 1).toString() + '-' +
+                  date.getDate().toString() + ' ' +
+                  date.getHours().toString() + ':' +
+                  date.getMinutes().toString() + ':' +
+                  date.getSeconds().toString();
+        alert(str);
+        return str;
+    },
+
     postTopic: function() {
-        var form = this.up('form').getForm();
-        if(form.isValid()) {
+        var form = this.up('form');
+        if(form.getForm().isValid()) {
+            if(form.instance.hasDateRange) {
+                var dates = form.instance.openRange.getValue();
+                form.getForm().findField("start-date").setValue(form.instance.dateToString(dates[0]));
+                form.getForm().findField("end-date").setValue(form.instance.dateToString(dates[1]));
+            }
+
             form.submit({
-                success: function() { Ext.Msg.alert("success","success"); },
+                success: function(f, action) {
+                    PageGlobals.contentPanel.add(new CM.Discussion.Topic({ class: form.instance.class, courseId: form.instance.courseId,
+                        boardId: form.instance.boardId, boardName: form.instance.boardName, topicId: action.result.topicId,
+                        topicName: form.getForm().findField("topic-name").getValue(), newPost: false }));
+                    PageGlobals.contentPanel.getLayout().setActiveItem(form.instance.class + "-topic" + action.result.topicId);
+                },
                 failure: function() { Ext.Msg.alert("Error","Unable to create topic. Try refreshing the page."); }
             });
         }
     },
 
     cancel: function() {
-        console.log("Cancel");
+        var instance = this.up('form').instance;
+        PageGlobals.contentPanel.getLayout().setActiveItem(instance.class + "-thread-list");
+        PageGlobals.contentPanel.remove(instance);
     }
 });

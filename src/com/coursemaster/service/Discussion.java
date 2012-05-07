@@ -21,11 +21,6 @@ import com.coursemaster.servlet.util.EmailUtil;
 import com.coursemaster.servlet.util.FileUtil;
 
 public class Discussion extends AbstractService {
-    private static final int TOPIC_STATUS_OPEN = 1;
-
-    private static final int BOARD_STATUS_OPEN = 1;
-    private static final int BOARD_STATUS_RESPONSE_ONLY = 2;
-
     @Override
     public void doRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if(request.getMethod().equals("GET")) {
@@ -47,8 +42,50 @@ public class Discussion extends AbstractService {
             deletePost(request, response);
         } else if(command.equals("delete-topic")) {
             deleteTopic(request, response);
+        } else if(command.equals("modify-post")) {
+            modifyPost(request, response);
+        } else if(command.equals("edit-board-status")) {
+            editBoardStatus(request, response);
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private void editBoardStatus(HttpServletRequest request, HttpServletResponse response) {
+        Session session = (Session)request.getAttribute("session");
+
+        String query = String.format(
+                "update discussion_board board " +
+                "join course on board.course = course.id " +
+                "set board.status = %s " +
+                "where board.id = %s and course.prof = %d",
+                request.getParameter("status"), request.getParameter("boardId"), session.getId());
+        int rowsAffected = DatabaseConnectionManager.executeUpdate(query);
+
+        if(rowsAffected > 0) {
+            response.setContentType("application/json");
+            response.setContentLength(0);
+        } else {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        }
+    }
+
+    private void modifyPost(HttpServletRequest request, HttpServletResponse response) {
+        Session session = (Session)request.getAttribute("session");
+
+        String message = request.getParameter("message").replace("'", "\\'");
+
+        String query = String.format(
+                "update discussion_post post set content = '%s' " +
+                "where post.id = %s and post.owner = %d",
+                message, request.getParameter("postId"), session.getId());
+        int rowsAffected = DatabaseConnectionManager.executeUpdate(query);
+
+        if(rowsAffected > 0) {
+            response.setContentType("application/json");
+            response.setContentLength(0);
+        } else {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 
@@ -69,11 +106,9 @@ public class Discussion extends AbstractService {
         if(deleteAllowed) {
             sendPostDeletionEmail(postId);
 
-            //String deletePostQuery = String.format("delete from discussion_post where id = %s",
-            //        postId);
-            String deleteTopicQuery = String.format("delete from discussion_topic where root = %s",
+            String deleteQuery = String.format("delete from discussion_topic where root = %s",
                     postId);
-            if(DatabaseConnectionManager.executeDelete(deleteTopicQuery)) {
+            if(DatabaseConnectionManager.executeDelete(deleteQuery)) {
                 response.setContentType("application/json");
                 response.setContentLength(0);
             } else {
@@ -171,7 +206,7 @@ public class Discussion extends AbstractService {
         response.setContentLength(0);
     }
 
-    private void postTopic(HttpServletRequest request, HttpServletResponse response) {
+    private void postTopic(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Session session = (Session)request.getAttribute("session");
 
         String title = request.getParameter("topic-name").replace("'", "\\'");
@@ -185,8 +220,24 @@ public class Discussion extends AbstractService {
             return;
         }
 
-        String topicQuery = String.format("insert into discussion_topic (board, root, name, status) values (%s, %d, '%s', %d)",
-                request.getParameter("board"), postId, title, TOPIC_STATUS_OPEN);
+        String fieldList = "(board, root, name";
+        String valueList = String.format("(%s, %d, '%s'", request.getParameter("board"), postId, title);
+        String startDate = request.getParameter("start-date");
+        if(!startDate.isEmpty()) {
+            fieldList += ", start";
+            valueList += ", timestamp '" + startDate + "'";
+        }
+        
+        String endDate = request.getParameter("end-date");
+        if(!endDate.isEmpty()) {
+            fieldList += ", end";
+            valueList += ", timestamp '" + endDate + "'";
+        }
+
+        fieldList += ")";
+        valueList += ")";
+
+        String topicQuery = String.format("insert into discussion_topic %s values %s", fieldList, valueList);
         int topicId = DatabaseConnectionManager.executeInsert(topicQuery);
         if(topicId == -1) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -198,7 +249,7 @@ public class Discussion extends AbstractService {
         DatabaseConnectionManager.executeUpdate(updatePostParentQuery);
 
         response.setContentType("application/json");
-        response.setContentLength(0);
+        response.getWriter().write("{\"success\":true,\"topicId\":" + topicId + "}");
     }
 
     private void createBoard(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -252,17 +303,26 @@ public class Discussion extends AbstractService {
     }
 
     private void getTopics(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JSONObject rsp = DatabaseConnectionManager.executeQuery(String.format(
+        Session session = (Session)request.getAttribute("session");
+
+        String query = String.format(
                 "select topic.id, topic.name, user.fullname postedBy, root.dte postedOn, " +
                 "(select count(*) from discussion_post post where post.parent = topic.id) replies " +
                 "from discussion_topic topic " +
                 "join discussion_post root on root.id = topic.root " +
                 "join user on user.id = root.owner " +
                 "where topic.board = %s",
-                request.getParameter("boardId")));
+                request.getParameter("boardId"));
 
-          response.setStatus(HttpServletResponse.SC_OK);
-          response.getWriter().write(rsp.toString());
+        if(session.getRole() == Role.STUDENT) {
+            query += " and (topic.start is null or topic.start <= now())" +
+                     " and (topic.end is null or topic.end >= now())";
+        }
+
+        JSONObject rsp = DatabaseConnectionManager.executeQuery(query);
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.getWriter().write(rsp.toString());
     }
 
     private void getBoards(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -272,15 +332,9 @@ public class Discussion extends AbstractService {
                 "select board.id, board.name, count(topic.id) topicCount, board.status " +
                 "from discussion_board board " +
                 "left join discussion_topic topic on topic.board = board.id " +
-                "where board.course = %s ",
+                "where board.course = %s " +
+                "group by board.id, board.name;",
                 request.getParameter("courseId"));
-
-        if(session.getRole() == Role.STUDENT) {
-            query += String.format("and board.status in (%d, %d) ",
-                    BOARD_STATUS_OPEN, BOARD_STATUS_RESPONSE_ONLY);
-        }
-
-        query += "group by board.id, board.name;";
         JSONObject rsp = DatabaseConnectionManager.executeQuery(query);
 
         response.setStatus(HttpServletResponse.SC_OK);
