@@ -591,6 +591,12 @@ Extensible.calendar.data.EventMappings = {
         type:       'date',
         dateFormat: 'c'
     },
+    VisibleDate: {
+        name: 'visible',
+        mapping: 'visible',
+        type: 'date',
+        dateFormat: 'c'
+    },
     RRule: { // not currently used
         name:    'RecurRule', 
         mapping: 'rrule', 
@@ -3622,7 +3628,7 @@ Ext.define('Extensible.form.field.DateRange', {
                 ]
             }];
         }
-        
+
         me.callParent(arguments);
         me.initRefs();
     },
@@ -5222,6 +5228,7 @@ Ext.define('Extensible.calendar.form.EventWindow', {
     closeButtonText: 'Close',
     titleLabelText: 'Title',
     datesLabelText: 'When',
+    visibleLabelText: 'Visible Date',
     calendarLabelText: 'Calendar',
     
     // General configs
@@ -5351,6 +5358,31 @@ Ext.define('Extensible.calendar.form.EventWindow', {
             fieldLabel: this.datesLabelText
         }];
         
+        if (SessionGlobals.role == 2) {
+            items.push({
+                xtype: 'container',
+                layout: 'hbox',
+                items: [{
+                    fieldLabel: 'Visible',
+                    labelWidth: 65,
+                    xtype: 'datefield',
+                    itemId: this.id + '-visible-date',
+                    name: 'visible',
+                    format: 'n/j/Y',
+                    width: 170,
+                    singleLine: true
+                }, {
+                    xtype: 'timefield',
+                    margin: '0 3px',
+                    itemId: this.id + '-visible-time',
+                    name: 'visible-time',
+                    width: 90,
+                    value: '12:00 AM',
+                    singleLine: true
+                }]
+            });
+        }
+        
         if(this.calendarStore){
             items.push({
                 xtype: 'extensible.calendarcombo',
@@ -5458,6 +5490,7 @@ Ext.define('Extensible.calendar.form.EventWindow', {
             rec = Ext.create('Extensible.calendar.data.EventModel');
             //rec.data[M.EventId.name] = this.newId++;
             rec.data[M.StartDate.name] = start;
+            rec.data[M.VisibleDate.name] = start;
             rec.data[M.EndDate.name] = end;
             rec.data[M.IsAllDay.name] = !!o[M.IsAllDay.name] || start.getDate() != Extensible.Date.add(end, {millis: 1}).getDate();
             

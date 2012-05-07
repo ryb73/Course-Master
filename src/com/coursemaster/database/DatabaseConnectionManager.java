@@ -272,7 +272,7 @@ public abstract class DatabaseConnectionManager {
         "create table submission(" +
         "id     INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
         "folder INT NOT NULL," +
-        "path   INT NOT NULL," +
+        "path   VARCHAR(128) NOT NULL," +
         "name   VARCHAR(128) NOT NULL," +
         "owner  INT NOT NULL," +
         "dte   DATETIME NOT NULL," +
