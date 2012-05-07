@@ -41,7 +41,7 @@ Ext.define("CM.Class.Home", {
 	
     loadDropbox: function(btn, evt) {                        
         if (!PageGlobals.contentPanel.getChildByElement(btn.class + "-dropbox-root")) {
-            PageGlobals.contentPanel.add(new CM.Dropbox.DRoot({ class: btn.class, courseId: this.ownerCt.courseId })); 
+            PageGlobals.contentPanel.add(new CM.Dropbox.Pane({class: btn.class, courseId: this.ownerCt.courseId}));
         }
 
         PageGlobals.contentPanel.getLayout().setActiveItem(btn.class + '-dropbox-root');
