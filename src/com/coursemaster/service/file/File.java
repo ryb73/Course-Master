@@ -22,18 +22,32 @@ public class File extends AbstractService {
         InputStream partReader;
 
         // Read parameters
-        String fileName = readPart((InputStream) request.getPart("name").getInputStream());
+        String name = readPart((InputStream) request.getPart("name").getInputStream());
         String courseId = readPart((InputStream) request.getPart("course").getInputStream());
-        String dropboxId = "1";//= request.getParameter("dropbox");
+        String desc = readPart((InputStream) request.getPart("info").getInputStream());
+        String dropboxId = request.getParameter("fid"); // ="1";
         String fileData = readPart((InputStream) request.getPart("file1").getInputStream());
+        
+        //TODO
+        String fileName = readPart((InputStream) request.getPart("name").getInputStream());
+        String owner = readPart((InputStream) request.getPart("owner").getInputStream());
 
-        FileWriter writer = new FileWriter(new java.io.File(
-            Settings.courseMasterDirectory + "uploads/" +
-            courseId + Settings.FILESEPARATOR + dropboxId + Settings.FILESEPARATOR + fileName));
+        String path = Settings.courseMasterDirectory + "uploads" + Settings.courseMasterDirectory +
+                courseId + Settings.FILESEPARATOR + dropboxId + Settings.FILESEPARATOR + fileName;
+        FileWriter writer = new FileWriter(new java.io.File(path));
         writer.write(fileData);
         writer.close();
 
-        response.getWriter().write("{ success: true }");
+         //TODO
+	  DatabaseConnectionManager.executeInsert(String.format(
+			  "insert into submission (folder, path, name, owner, dte)" +
+			  " '%s', '%s', '%s', '%s', NOW());",
+			  dropboxId, path, name, owner));
+	  
+	//  response.setContentType("application/json");
+	//  response.setContentLength(0);
+
+      response.getWriter().write("{ success: true }");
 
 //              String name = data.getString("name");
 //              String ext = data.getString("ext");
@@ -44,18 +58,12 @@ public class File extends AbstractService {
 
           //name, file1, info
 
-          String name = request.getParameter("name");
-          String ext = request.getParameter("ext");
-          String course = request.getParameter("course");
+//          String name = request.getParameter("name");
+//          String ext = request.getParameter("ext");
+//          String course = request.getParameter("course");
 
-          //TODO save file to disk
-          //TODO insert into DB
-//          DatabaseConnectionManager.executeInsert(String.format(
-//             "insert into folder (name,course,ext,start,end,disp)" 
-//             " values ('%s', '%s', '%s', NOW(), NOW(), NOW());",
-//             name, course, ext));
-//          response.setContentType("application/json");\
-//          response.setContentLength(0);
+    
+
     }
 
     private String readPart(InputStream part) throws IOException {
