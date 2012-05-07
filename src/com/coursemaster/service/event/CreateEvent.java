@@ -28,11 +28,11 @@ public class CreateEvent extends AbstractService {
             String end = data.getString("end");
             String userId = String.valueOf(session.getId());
             String visible = (session.getRole().equals(Role.PROFESSOR)) ? '\'' + data.getString("visible") + '\'' : "NOW()";
-            char type = (session.getRole().equals(Role.PROFESSOR)) ? '0' : '1';
+            String type = (session.getRole().equals(Role.PROFESSOR)) ? data.getString("type") : "1";
 
             int res = DatabaseConnectionManager.executeInsert(String.format(
                "insert into event (name, descr, start, end, visible, owner, course, type)" +
-              " values ('%s', '%s', '%s', '%s', %s, %s, %s, %c);",
+              " values ('%s', '%s', '%s', '%s', %s, %s, %s, %s);",
             name, descr, start, end, visible, userId, course, type));
 
             response.getWriter().write("{ success : " + (res > 0) + " }");

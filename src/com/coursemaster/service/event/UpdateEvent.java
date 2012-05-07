@@ -31,7 +31,7 @@ public class UpdateEvent extends AbstractService {
 
             int res = DatabaseConnectionManager.executeUpdate(String.format(
                "update event set name = '%s', descr = '%s', start = '%s'," +
-               "end = '%s', visible =  %s, course =  %s where id = %s;",
+               "end = '%s', visible = %s, course =  %s where id = %s;",
                name, descr, start, end, visible, course, id));
 
             response.getWriter().write("{ success : " + (res > 0) + " }");

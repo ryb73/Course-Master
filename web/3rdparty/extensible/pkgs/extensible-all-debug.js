@@ -628,9 +628,14 @@ Extensible.calendar.data.EventMappings = {
         type:    'string'
     },
     Owner: {
-        name:    'Owner',
+        name:    'owner',
         mapping: 'owner',
-        type:     'int'
+        type:    'int'
+    },
+    Type: {
+        name:    'type',
+        mapping: 'type',
+        type:    'int'
     }
 };/**
  * @class Extensible.calendar.data.CalendarMappings
@@ -5228,7 +5233,16 @@ Ext.define('Extensible.calendar.form.EventWindow', {
     closeButtonText: 'Close',
     titleLabelText: 'Title',
     datesLabelText: 'When',
+    typeLabelText: 'Type',
     calendarLabelText: 'Calendar',
+    
+    types: Ext.create('Ext.data.Store', {
+        fields: ['id', 'name'],
+        data: [
+            { 'id': 0, 'name': 'Course Event' },
+            { 'id': 1, 'name': 'Personal' }
+        ]
+    }),
     
     // General configs
     closeAction: 'hide',
@@ -5378,6 +5392,19 @@ Ext.define('Extensible.calendar.form.EventWindow', {
                     width: 90,
                     value: '12:00 AM',
                     singleLine: true
+                }, {
+                    xtype: 'combo',
+                    itemId: this.id + '-event-type',
+                    fieldLabel: this.typeLabelText,
+                    labelWidth: 30,
+                    width: 150,
+                    name: 'type',
+                    store: this.types,
+                    displayField: 'name',
+                    valueField: 'id',
+                    editable: false,
+                    allowBlank: false,
+                    queryMode: 'local'
                 }]
             });
         }

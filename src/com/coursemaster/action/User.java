@@ -182,7 +182,7 @@ public class User implements RestfulResponder {
                                 "update user set password = '%s'," +
                                 " fullname = '%s', role = %s where id = %s;",
                                 (String) userData.get("password"),(String) userData.get("fullname"), 
-                                 ((Integer) userData.get("role")).toString(), idString));
+                                 userData.get("role"), idString));
                         response.getWriter().write(updated == 1 ? BASIC_SUCCESS_RESPONSE : DATABASE_FAILURE_RESPONSE);
                     }
                 }
