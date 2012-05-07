@@ -49,7 +49,7 @@ Ext.define("CM.Discussion.CreateTopic", {
                 {
                     xtype: 'hidden',
                     name: 'start-date'
-                },
+                }, {
                     xtype: 'hidden',
                     name: 'end-date',
                 }, {
@@ -100,7 +100,7 @@ Ext.define("CM.Discussion.CreateTopic", {
             }
 
             form.submit({
-                success: function() {
+                success: function(f, action) {
                     PageGlobals.contentPanel.add(new CM.Discussion.Topic({ class: form.instance.class, courseId: form.instance.courseId,
                         boardId: form.instance.boardId, boardName: form.instance.boardName, topicId: action.result.topicId,
                         topicName: form.getForm().findField("topic-name").getValue(), newPost: false }));
