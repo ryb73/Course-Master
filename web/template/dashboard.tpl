@@ -22,11 +22,14 @@
         <script type="text/javascript" src="/javascript/Class/Home.js"></script>
         <script type="text/javascript" src="/javascript/Class/Dashboard.js"></script>
         <script type="text/javascript" src="/javascript/Class/Discussion/Root.js"></script>
-		<script type="text/javascript" src="/javascript/Class/Discussion/ThreadList.js"></script>
-		<script type="text/javascript" src="/javascript/Class/Discussion/CreateTopic.js"></script>
-		<script type="text/javascript" src="/javascript/Class/Discussion/Topic.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Discussion/ThreadList.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Discussion/CreateTopic.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Discussion/Topic.js"></script>
         <script type="text/javascript" src="/javascript/Class/Event/Root.js"></script>
-        <script type="text/javascript" src="/javascript/Class/Dropbox/DRoot.js"></script>   
+        //<script type="text/javascript" src="/javascript/Class/Dropbox/file-upload.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Dropbox/DRoot.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Dropbox/FileWindow.js"></script>
+        <script type="text/javascript" src="/javascript/Class/Dropbox/DropBoxPane.js"></script>  
 
         <script type="text/javascript" src="/javascript/Global/Content.js"></script>
         <script type="text/javascript" src="/javascript/Global/Dashboard.js"></script>
