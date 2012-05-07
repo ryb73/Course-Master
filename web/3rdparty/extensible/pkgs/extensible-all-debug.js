@@ -5596,6 +5596,8 @@ Ext.define('Extensible.calendar.form.EventWindow', {
             M = Extensible.calendar.data.EventMappings,
             obj = {};
 
+        values['visible'] = new Date(values['visible'] + ' ' + values['visible-time']);
+
         fields.each(function(f) {
             name = f.name;
             if (name in values) {
