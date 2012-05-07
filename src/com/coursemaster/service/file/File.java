@@ -1,46 +1,53 @@
 package com.coursemaster.service.file;
 
+import java.io.BufferedInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.coursemaster.auth.Session;
-import com.coursemaster.auth.Session.Role;
 import com.coursemaster.database.DatabaseConnectionManager;
+import com.coursemaster.server.Settings;
 import com.coursemaster.service.AbstractService;
-import com.coursemaster.servlet.util.FileUtil;
 
 public class File extends AbstractService {
     @Override
     public void doRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-           response.setStatus(HttpServletResponse.SC_OK);
+        response.setStatus(HttpServletResponse.SC_OK);
 
-          String courseId = request.getParameter("courseId");
+        byte[] partHolder;
+        InputStream partReader;
 
-          //TODO get file
+        // Read parameters
+        String name = readPart((InputStream) request.getPart("name").getInputStream());
+        String courseId = readPart((InputStream) request.getPart("course").getInputStream());
+        String desc = readPart((InputStream) request.getPart("info").getInputStream());
+        String dropboxId = request.getParameter("fid"); // ="1";
+        String fileData = readPart((InputStream) request.getPart("file1").getInputStream());
+        
+        //TODO
+        String fileName = readPart((InputStream) request.getPart("name").getInputStream());
+        String owner = readPart((InputStream) request.getPart("owner").getInputStream());
 
-          JSONObject responseObject = DatabaseConnectionManager.executeQuery(String.format(
-                  "select * from event " 
-                  "where course = %s " 
-                  "and owner = (select prof from course where id = %s);",
-                  courseId, courseId));
+        String path = Settings.courseMasterDirectory + "uploads" + Settings.courseMasterDirectory +
+                courseId + Settings.FILESEPARATOR + dropboxId + Settings.FILESEPARATOR + fileName;
+        FileWriter writer = new FileWriter(new java.io.File(path));
+        writer.write(fileData);
+        writer.close();
 
-          try {
-              if (responseObject == null) {
-                  responseObject = new JSONObject("{status: 'Failure', count: 0, data: []}");
-                  response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-              }
-          } catch (JSONException e) { }
+         //TODO
+	  DatabaseConnectionManager.executeInsert(String.format(
+			  "insert into submission (folder, path, name, owner, dte)" +
+			  " '%s', '%s', '%s', '%s', NOW());",
+			  dropboxId, path, name, owner));
+	  
+	//  response.setContentType("application/json");
+	//  response.setContentLength(0);
 
-          response.getWriter().write(responseObject.toString());
-      }
-
-          System.out.println("Hit submit");
+      response.getWriter().write("{ success: true }");
 
 //              String name = data.getString("name");
 //              String ext = data.getString("ext");
@@ -51,18 +58,18 @@ public class File extends AbstractService {
 
           //name, file1, info
 
-          String name = request.getParameter("name");
-          String ext = request.getParameter("ext");
-          String course = request.getParameter("course");
+//          String name = request.getParameter("name");
+//          String ext = request.getParameter("ext");
+//          String course = request.getParameter("course");
 
-          //TODO save file to disk
-          //TODO insert into DB
-//          DatabaseConnectionManager.executeInsert(String.format(
-//             "insert into folder (name,course,ext,start,end,disp)" 
-//             " values ('%s', '%s', '%s', NOW(), NOW(), NOW());",
-//             name, course, ext));
-//          response.setContentType("application/json");\
-//          response.setContentLength(0);
-   }
+    
+
+    }
+
+    private String readPart(InputStream part) throws IOException {
+        byte []partHolder = new byte[part.available()];
+        part.read(partHolder);
+        return new String(partHolder);
+    }
 }
 
