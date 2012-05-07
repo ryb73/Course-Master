@@ -47,10 +47,11 @@ public class CreateDropboxes extends AbstractService {
         
         
         //Create if not exists folders
-        String pathname = Settings.courseMasterDirectory + "uploads" + Settings.courseMasterDirectory +
+        String pathname = Settings.courseMasterDirectory + "uploads" + Settings.FILESEPARATOR +
                 course + Settings.FILESEPARATOR + new Integer(id).toString();
+  
         if(!new File(pathname).mkdirs()){
-        	//ERROR
+        	System.out.println("Failed to make directory");
         }
         System.out.println("PATH=" + pathname);
         

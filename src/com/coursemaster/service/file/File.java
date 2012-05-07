@@ -15,6 +15,9 @@ import com.coursemaster.service.AbstractService;
 
 public class File extends AbstractService {
     @Override
+    /**
+     * this is to POST A FILE
+     */
     public void doRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -25,15 +28,16 @@ public class File extends AbstractService {
         String name = readPart((InputStream) request.getPart("name").getInputStream());
         String courseId = readPart((InputStream) request.getPart("course").getInputStream());
         String desc = readPart((InputStream) request.getPart("info").getInputStream());
-        String dropboxId = request.getParameter("fid"); // ="1";
+        String dropboxId = readPart((InputStream) request.getPart("folder").getInputStream());
         String fileData = readPart((InputStream) request.getPart("file1").getInputStream());
         
         //TODO
         String fileName = readPart((InputStream) request.getPart("name").getInputStream());
         String owner = readPart((InputStream) request.getPart("owner").getInputStream());
 
-        String path = Settings.courseMasterDirectory + "uploads" + Settings.courseMasterDirectory +
+        String path = Settings.courseMasterDirectory + "uploads" + Settings.FILESEPARATOR +
                 courseId + Settings.FILESEPARATOR + dropboxId + Settings.FILESEPARATOR + fileName;
+        System.out.println("WRITING TO " + path);
         FileWriter writer = new FileWriter(new java.io.File(path));
         writer.write(fileData);
         writer.close();
@@ -41,13 +45,14 @@ public class File extends AbstractService {
          //TODO
 	  DatabaseConnectionManager.executeInsert(String.format(
 			  "insert into submission (folder, path, name, owner, dte)" +
-			  " '%s', '%s', '%s', '%s', NOW());",
+			  " values ('%s', '%s', '%s', '%s', NOW());",
 			  dropboxId, path, name, owner));
 	  
-	//  response.setContentType("application/json");
-	//  response.setContentLength(0);
-
-      response.getWriter().write("{ success: true }");
+//	  response.setContentType("application/json");
+//	  response.setContentLength(0);
+//
+//      response.getWriter().write("{ success: true }");
+ 
 
 //              String name = data.getString("name");
 //              String ext = data.getString("ext");
