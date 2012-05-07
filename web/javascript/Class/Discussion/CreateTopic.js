@@ -103,7 +103,6 @@ Ext.define("CM.Discussion.CreateTopic", {
                   date.getHours().toString() + ':' +
                   date.getMinutes().toString() + ':' +
                   date.getSeconds().toString();
-        alert(str);
         return str;
     },
 
