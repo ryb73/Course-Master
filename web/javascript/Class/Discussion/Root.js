@@ -68,9 +68,12 @@ Ext.define('CM.Discussion.Root', {
     },
 
     onItemDblClick: function(view, record) {
-        if (!PageGlobals.contentPanel.getChildByElement(this.class + "-thread-list")) {
-            PageGlobals.contentPanel.add(new CM.Discussion.ThreadList({ class: this.class, courseId: this.courseId, boardId: record.get("id"), boardName: record.get("name") }));
+        var threadListPanel = PageGlobals.contentPanel.getChildByElement(this.class + "-thread-list");
+        if (threadListPanel) {
+            threadListPanel.destroy();
         }
+        
+        PageGlobals.contentPanel.add(new CM.Discussion.ThreadList({ class: this.class, courseId: this.courseId, boardId: record.get("id"), boardName: record.get("name") }));
 
         PageGlobals.contentPanel.getLayout().setActiveItem(this.class + '-thread-list');
     },

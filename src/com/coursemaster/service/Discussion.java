@@ -1,15 +1,23 @@
 package com.coursemaster.service;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.coursemaster.auth.Session;
 import com.coursemaster.auth.Session.Role;
 import com.coursemaster.database.DatabaseConnectionManager;
+import com.coursemaster.servlet.util.EmailUtil;
 import com.coursemaster.servlet.util.FileUtil;
 
 public class Discussion extends AbstractService {
@@ -33,16 +41,144 @@ public class Discussion extends AbstractService {
             createBoard(request, response);
         } else if(command.equals("post-topic")) {
             postTopic(request, response);
+        } else if(command.equals("post-reply")) {
+            postReply(request, response);
+        } else if(command.equals("delete-post")) {
+            deletePost(request, response);
+        } else if(command.equals("delete-topic")) {
+            deleteTopic(request, response);
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
+    private void deleteTopic(HttpServletRequest request, HttpServletResponse response) {
+        Session session = (Session)request.getAttribute("session");
+
+        String postId = request.getParameter("postId");
+
+        boolean deleteAllowed;
+        try {
+            deleteAllowed = canDeletePost(postId, session.getId());
+        } catch(Exception e) {
+            logger.error("An exception was thrown while processing a query: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        if(deleteAllowed) {
+            sendPostDeletionEmail(postId);
+
+            //String deletePostQuery = String.format("delete from discussion_post where id = %s",
+            //        postId);
+            String deleteTopicQuery = String.format("delete from discussion_topic where root = %s",
+                    postId);
+            if(DatabaseConnectionManager.executeDelete(deleteTopicQuery)) {
+                response.setContentType("application/json");
+                response.setContentLength(0);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        }
+    }
+
+    private boolean canDeletePost(String postId, long userId) throws SQLException {
+        String query = String.format(
+                "select 1 from discussion_post post " +
+                "join discussion_topic topic on post.parent = topic.id " +
+                "join discussion_board board on topic.board = board.id " +
+                "join course on board.course = course.id " +
+                "where post.id = %s and (post.owner = %d or course.prof = %d)",
+                postId, userId, userId);
+
+        Connection conn = DatabaseConnectionManager.getConnection();
+        Statement stmt = conn.createStatement();
+        ResultSet res = stmt.executeQuery(query);
+        return res.next(); // if query returns results, then delete is allowed
+    }
+
+    private void deletePost(HttpServletRequest request, HttpServletResponse response) {
+        Session session = (Session)request.getAttribute("session");
+
+        boolean deleteAllowed;
+        try {
+            deleteAllowed = canDeletePost(request.getParameter("postId"), session.getId());
+        } catch(Exception e) {
+            logger.error("An exception was thrown while processing a query: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        if(deleteAllowed) {
+            sendPostDeletionEmail(request.getParameter("postId"));
+
+            String deleteQuery = String.format("delete from discussion_post where id = %s",
+                    request.getParameter("postId"));
+            if(DatabaseConnectionManager.executeDelete(deleteQuery)) {
+                response.setContentType("application/json");
+                response.setContentLength(0);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        }
+    }
+
+    private static void sendPostDeletionEmail(String postId) {
+        JSONObject res = DatabaseConnectionManager.executeQuery(String.format(
+                "select owner.fullname, owner.email, post.content, course.name courseName, " +
+                        "board.name boardName " +
+                "from discussion_post post " +
+                "join user owner on post.owner = owner.id " +
+                "join discussion_topic topic on post.parent = topic.id " +
+                "join discussion_board board on topic.board = board.id " +
+                "join course on board.course = course.id " +
+                "where post.id = %s", postId));
+
+        try {
+            @SuppressWarnings("unchecked")
+            HashMap<String, String> resultMap = (HashMap<String, String>) res.getJSONArray("data").get(0);
+
+            String subject = String.format("Post deleted on %s discussion board.",
+                    resultMap.get("courseName"));
+
+            String message = String.format("Hello %s,%n%n" +
+            		"This email is to notify you that your post in the %s discussion board for %s " +
+            		"which said:%n%n%s%n%nHas been deleted.%n%n" +
+            		"This email has been automatically generated, please do not reply.",
+            		resultMap.get("fullname"), resultMap.get("boardName"),
+            		resultMap.get("courseName"), resultMap.get("content"));
+
+            EmailUtil.sendEmail(resultMap.get("email"), subject, message);
+        } catch(Exception e) {
+            logger.error("An exception was thrown while attempting to send post deletion email: " + e.getMessage());
+        }
+    }
+
+    private void postReply(HttpServletRequest request, HttpServletResponse response) {
+        Session session = (Session)request.getAttribute("session");
+
+        String message = request.getParameter("message").replace("'", "\\'");
+
+        String query = String.format("insert into discussion_post (dte, owner, parent, content) values (now(), %d, %s, '%s')",
+                session.getId(), request.getParameter("topicId"), message);
+        DatabaseConnectionManager.executeInsert(query);
+
+        response.setContentType("application/json");
+        response.setContentLength(0);
+    }
+
     private void postTopic(HttpServletRequest request, HttpServletResponse response) {
         Session session = (Session)request.getAttribute("session");
 
+        String title = request.getParameter("topic-name").replace("'", "\\'");
+        String message = request.getParameter("message").replace("'", "\\'");
+
         String postQuery = String.format("insert into discussion_post (dte, owner, content) values (now(), %d, '%s')",
-                session.getId(), request.getParameter("message"));
+                session.getId(), message);
         int postId = DatabaseConnectionManager.executeInsert(postQuery);
         if(postId == -1) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -50,7 +186,7 @@ public class Discussion extends AbstractService {
         }
 
         String topicQuery = String.format("insert into discussion_topic (board, root, name, status) values (%s, %d, '%s', %d)",
-                request.getParameter("board"), postId, request.getParameter("topic-name"), TOPIC_STATUS_OPEN);
+                request.getParameter("board"), postId, title, TOPIC_STATUS_OPEN);
         int topicId = DatabaseConnectionManager.executeInsert(topicQuery);
         if(topicId == -1) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -163,4 +299,6 @@ public class Discussion extends AbstractService {
         response.getWriter().write(discussionAsString);
         response.setStatus(HttpServletResponse.SC_OK);
     }
+
+    private static Logger logger = Logger.getLogger(Discussion.class);
 }

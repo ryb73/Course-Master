@@ -22,6 +22,7 @@ Ext.define("CM.Discussion.Topic", {
             border: false,
             id: this.class + '-topic' + this.topicId,
             title: this.class + ' Discussion Board > ' + this.boardName + ' > ' + this.topicName,
+            autoScroll: false,
             layout: {
                 type: 'vbox',
                 align: 'stretch'
@@ -33,7 +34,6 @@ Ext.define("CM.Discussion.Topic", {
             callback: function(records, operation, success) {
                 if(!success) {
                     Ext.Msg.alert("Error", "Unable to get topic content. Try refreshing the page.");
-                    alert(this.class);
                     PageGlobals.contentPanel.getLayout().setActiveItem(this.class + '-thread-list');
                 } else {
                     var postCount = posts.getCount();
@@ -41,19 +41,30 @@ Ext.define("CM.Discussion.Topic", {
                     for(var i = 0; i < postCount; ++i) {
                         var record = posts.getAt(i);
                         postItems[i] = {
-                            xtype: 'panel',
+                            xtype: 'form',
+                            url: (i == 0) ? '/service/discussion/delete-topic' : '/service/discussion/delete-post',
+                            instance: this,
                             title: 'Posted by ' + record.get("ownerName") + ' at ' + record.get("dte"),
                             padding: 10,
-                            items: {
+                            margin: '0 10px 0 0',
+                            items: [{
                                 border: false,
                                 padding: 10,
                                 html: record.get("content")
-                            },
+                            },{
+                                xtype: 'hidden',
+                                name: 'postId',
+                                value: record.get("id")
+                            }],
                         };
 
                         if(record.get("owner") == SessionGlobals.id || SessionGlobals.role == 2) {
                             Ext.apply(postItems[i], {
-                                bbar: [{ xtype: 'button', text: 'Delete' }]
+                                bbar: [{
+                                    xtype: 'button',
+                                    text: 'Delete',
+                                    handler: (i == 0) ? this.deleteTopic : this.deletePost
+                                }]
                             });
                         }
                     }
@@ -61,23 +72,98 @@ Ext.define("CM.Discussion.Topic", {
                     this.add(postItems);
                     this.add({
                         xtype: 'form',
+                        url: '/service/discussion/post-reply',
                         title: 'Post Reply',
                         padding: 10,
+                        margin: '0 10px 0 0',
                         layout: 'fit',
-                        items: {
+                        instance: this,
+                        items: [{
                             xtype: 'textarea',
                             name: 'message',
                             padding: 5,
+                            margin: '0 5px 0 0',
                             grow: true,
                             maxLength: 1024,
                             enforceMaxLength: true
-                        },
-                        bbar: [{ xtype: 'button', text: 'Post' }]
+                        },{
+                            xtype: 'hidden',
+                            name: 'topicId',
+                            value: this.topicId
+                        }],
+                        bbar: [{
+                            xtype: 'button',
+                            text: 'Post',
+                            handler: this.postReply
+                        }]
                     });
+
+                    Ext.getBody().down("div#" + this.id+"-body").down("div.x-box-inner").setStyle("overflow-y","auto");
+                    if(this.newPost)
+                        Ext.getBody().down("div#" + this.id+"-body").down("div.x-box-inner").scroll("b", 5000);
                 }
             }
         });
 
         this.callParent(arguments);
+    },
+
+    postReply: function() {
+        var form = this.up('form');
+        if(form.getForm().isValid()) {
+            form.submit({
+                success: function() {
+                    var newPanel = new CM.Discussion.Topic({ class: form.instance.class, courseId: form.instance.courseId, boardId: form.instance.boardId,
+                        boardName: form.instance.boardName, topicId: form.instance.topicId, topicName: form.instance.topicName, newPost: true });
+                    form.instance.destroy();
+                    PageGlobals.contentPanel.add(newPanel);
+                    PageGlobals.contentPanel.getLayout().setActiveItem(newPanel.class + "-topic" + newPanel.topicId);
+                },
+                failure: function() { Ext.Msg.alert("Error","Unable to post reply. Try refreshing the page."); }
+            });
+        }
+    },
+
+    deleteTopic: function() {
+        Ext.Msg.confirm("Delete Topic", "Are you sure you want to delete this topic?", function(btn) {
+            if(btn == "yes") {
+                var form = this.up('form');
+                if(form.getForm().isValid()) {
+                    form.submit({
+                        success: function() {
+                            var threadListPanel = PageGlobals.contentPanel.getChildByElement(this.class + "-thread-list");
+                            if (threadListPanel) {
+                                threadListPanel.destroy();
+                            }
+                            
+                            PageGlobals.contentPanel.add(new CM.Discussion.ThreadList({ class: form.instance.class, courseId: form.instance.courseId,
+                                boardId: form.instance.boardId, boardName: form.instance.boardName }));
+
+                            PageGlobals.contentPanel.getLayout().setActiveItem(form.instance.class + '-thread-list');
+
+                            form.instance.destroy();
+                            Ext.Msg.alert("Topic Deleted", "The topic has been successfully deleted.");
+                        },
+                        failure: function() { Ext.Msg.alert("Error","Unable to delete topic. Try refreshing the page."); }
+                    });
+                }
+            }
+        }, this);
+    },
+
+    deletePost: function() {
+        Ext.Msg.confirm("Delete Post", "Are you sure you want to delete this post?", function(btn) {
+            if(btn == "yes") {
+                var form = this.up('form');
+                if(form.getForm().isValid()) {
+                    form.submit({
+                        success: function() {
+                            form.destroy();
+                        },
+                        failure: function() { Ext.Msg.alert("Error","Unable to delete post. Try refreshing the page."); }
+                    });
+                }
+            }
+        }, this);
     }
 });
