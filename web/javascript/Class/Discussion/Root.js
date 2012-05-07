@@ -146,6 +146,7 @@ Ext.define('CM.Discussion.Root', {
     addBoard: function() {
         Ext.create('widget.window', {
             title: 'Add Discussion Board',
+            id: 'create-board-window',
             closable: true,
             width: 300,
             height: 150,
@@ -153,6 +154,7 @@ Ext.define('CM.Discussion.Root', {
             items: {
                 xtype: 'form',
                 url: '/service/discussion/create-board',
+                instance: this.instance,
 
                 layout: {
                     type: 'vbox',
@@ -191,8 +193,18 @@ Ext.define('CM.Discussion.Root', {
                         var form = this.up('form').getForm();
                         if(form.isValid()) {
                             form.submit({
-                                success: function() { Ext.Msg.alert("success","success"); },
-                                failure: function() { Ext.Msg.alert("Error","Unable to add discussion board."); }
+                                success: function() {
+                                    var boardsPanel = PageGlobals.contentPanel.getChildByElement(form.instance.class + "-board-root");
+                                    if (boardsPanel) {
+                                        boardsPanel.destroy();
+                                    }
+
+                                    PageGlobals.contentPanel.add(new CM.Discussion.Root({ class: form.instance.class, courseId: form.instance.courseId }));
+                                    PageGlobals.contentPanel.getLayout().setActiveItem(form.instance.class + '-board-root');
+
+                                    Ext.Msg.alert("Success", "The board has been added.");
+                                },
+                                failure: function() { Ext.Msg.alert("Error", "Unable to add discussion board."); }
                             });
                         }
                     }
