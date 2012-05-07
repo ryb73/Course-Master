@@ -37,6 +37,9 @@ Ext.define("CM.Admin.User.List", {
             id: 'User-List-panel',
             store: this.userStore,
             border: false,
+            listeners: {
+                itemdblclick: this.onItemDblClick
+            },
             columns: [{
                 header: 'Full Name',
                 dataIndex: 'fullname',
@@ -62,6 +65,63 @@ Ext.define("CM.Admin.User.List", {
         });
 
         this.callParent(arguments);
+    },
+
+    onItemDblClick: function(view, record) {
+        var roleStore = new Ext.data.Store({
+            fields: ['value', 'name'],
+            data : [
+                { value: 1, name: 'Student'       },
+                { value: 2, name: 'Professor'     },
+                { value: 3, name: 'Administrator' }
+            ]
+        });
+
+        new Ext.window.Window({
+            layout: 'fit',
+            height: 150,
+            width: 300,
+            items: [{
+                xtype: 'form',
+                url: '/action/user/update',
+                border: false,
+                items: [{
+                    xtype: 'hidden',
+                    name: 'id',
+                    value: record.data.id
+                }, {
+                    fieldLabel: 'Full Name',
+                    xtype: 'textfield',
+                    name: 'fullname',
+                    value: record.data.fullname
+                },{
+                    fieldLabel: 'Role',
+                    xtype: 'combo',
+                    name: 'role',
+                    store: roleStore,
+                    displayField: 'name',
+                    valueField: 'value',
+                    editable: false,
+                    allowBlank: false,
+                    queryMode: 'local',
+                    value: record.data.role == 'Administrator' ? 3 : record.data.role == 'Professor' ? 2 : 1
+                }],
+                bbar: [{
+                    xtype: 'button',
+                    text: 'Update',
+                    handler: function() {
+                        this.up('form').getForm().submit({
+                            success: function(form, action) {
+                               Ext.Msg.alert('Success', 'Your entry was successfully stored.');
+                            },
+                            failure: function(form, action) {
+                                Ext.Msg.alert('Failed', action.result.errors.message);
+                            }
+                        });
+                    }
+                }]
+            }]
+        }).show();
     },
 
     onAddClick: function() {

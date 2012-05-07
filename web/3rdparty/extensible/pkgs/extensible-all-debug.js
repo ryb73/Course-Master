@@ -628,9 +628,14 @@ Extensible.calendar.data.EventMappings = {
         type:    'string'
     },
     Owner: {
-        name:    'Owner',
+        name:    'owner',
         mapping: 'owner',
-        type:     'int'
+        type:    'int'
+    },
+    Type: {
+        name:    'type',
+        mapping: 'type',
+        type:    'int'
     }
 };/**
  * @class Extensible.calendar.data.CalendarMappings
@@ -5228,8 +5233,16 @@ Ext.define('Extensible.calendar.form.EventWindow', {
     closeButtonText: 'Close',
     titleLabelText: 'Title',
     datesLabelText: 'When',
-    visibleLabelText: 'Visible Date',
+    typeLabelText: 'Type',
     calendarLabelText: 'Calendar',
+    
+    types: Ext.create('Ext.data.Store', {
+        fields: ['id', 'name'],
+        data: [
+            { 'id': 0, 'name': 'Course Event' },
+            { 'id': 1, 'name': 'Personal' }
+        ]
+    }),
     
     // General configs
     closeAction: 'hide',
@@ -5379,6 +5392,19 @@ Ext.define('Extensible.calendar.form.EventWindow', {
                     width: 90,
                     value: '12:00 AM',
                     singleLine: true
+                }, {
+                    xtype: 'combo',
+                    itemId: this.id + '-event-type',
+                    fieldLabel: this.typeLabelText,
+                    labelWidth: 30,
+                    width: 150,
+                    name: 'type',
+                    store: this.types,
+                    displayField: 'name',
+                    valueField: 'id',
+                    editable: false,
+                    allowBlank: false,
+                    queryMode: 'local'
                 }]
             });
         }
@@ -5584,17 +5610,22 @@ Ext.define('Extensible.calendar.form.EventWindow', {
 //    },
     
     updateRecord: function(record, keepEditing) {
-        // If it has an ID (not a new record) and it's not equal to the current user
-        if (record.data[Extensible.calendar.data.EventMappings.Owner.name] &&
-            record.data[Extensible.calendar.data.EventMappings.Owner.name] != SessionGlobals.id) {
-            return;
-        }
 
         var fields = record.fields,
             values = this.formPanel.getForm().getValues(),
             name,
             M = Extensible.calendar.data.EventMappings,
             obj = {};
+
+        // If it has an ID (not a new record) and it's not equal to the current user
+        if (!record.data[M.Owner.name]) {
+            record.data[M.Owner.name] = SessionGlobals.id;
+        }
+        else if (record.data[M.Owner.name] != SessionGlobals.id) {
+            return;
+        }
+
+        values['visible'] = new Date(values['visible'] + ' ' + values['visible-time']);
 
         fields.each(function(f) {
             name = f.name;
