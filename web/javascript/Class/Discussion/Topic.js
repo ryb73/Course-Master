@@ -253,9 +253,5 @@ Ext.define("CM.Discussion.Topic", {
                 failure: function() { Ext.Msg.alert("Error", "Unable to modify post. Try refreshing the page."); }
             });
         }
-<<<<<<< HEAD
     }
-=======
-     }
->>>>>>> upstream/master
 });
