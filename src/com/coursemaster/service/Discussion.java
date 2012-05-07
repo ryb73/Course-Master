@@ -60,6 +60,7 @@ public class Discussion extends AbstractService {
                 "set board.status = %s " +
                 "where board.id = %s and course.prof = %d",
                 request.getParameter("status"), request.getParameter("boardId"), session.getId());
+
         int rowsAffected = DatabaseConnectionManager.executeUpdate(query);
 
         if(rowsAffected > 0) {
@@ -335,6 +336,7 @@ public class Discussion extends AbstractService {
                 "where board.course = %s " +
                 "group by board.id, board.name;",
                 request.getParameter("courseId"));
+
         JSONObject rsp = DatabaseConnectionManager.executeQuery(query);
 
         response.setStatus(HttpServletResponse.SC_OK);

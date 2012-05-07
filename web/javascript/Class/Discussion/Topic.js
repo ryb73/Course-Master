@@ -145,6 +145,7 @@ Ext.define("CM.Discussion.Topic", {
                         boardName: form.instance.boardName, boardStatus: form.instance.boardStatus, topicId: form.instance.topicId,
                         topicName: form.instance.topicName, newPost: true });
                     form.instance.destroy();
+
                     PageGlobals.contentPanel.add(newPanel);
                     PageGlobals.contentPanel.getLayout().setActiveItem(newPanel.class + "-topic" + newPanel.topicId);
                 },
@@ -252,5 +253,9 @@ Ext.define("CM.Discussion.Topic", {
                 failure: function() { Ext.Msg.alert("Error", "Unable to modify post. Try refreshing the page."); }
             });
         }
+<<<<<<< HEAD
     }
+=======
+     }
+>>>>>>> upstream/master
 });

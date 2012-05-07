@@ -1,5 +1,31 @@
 Ext.define('CM.Discussion.Root', {
     extend: 'Ext.grid.Panel',
+    plugins: [
+        Ext.create('Ext.grid.plugin.CellEditing', {
+            clicksToEdit: 1,
+            listeners: {
+                edit: function(editor, e) {
+                    var tmpForm = new Ext.form.Panel({
+                        url: '/service/discussion/edit-board-status',
+                        items: [{
+                            xtype: 'hidden',
+                            name: 'boardId',
+                            value: e.record.get("id")
+                        },{
+                            xtype: 'hidden',
+                            name: 'status',
+                            value: e.record.get("status")
+                        }]
+                    });
+
+                    tmpForm.submit({
+                        success: function() { },
+                        failure: function() { Ext.Msg.alert("Error", "Unable to change board status. Try refreshing the page."); }
+                    });
+                }
+            }
+        })
+    ],
 
     plugins: [
         Ext.create('Ext.grid.plugin.CellEditing', {

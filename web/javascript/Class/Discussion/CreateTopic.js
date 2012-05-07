@@ -1,7 +1,23 @@
 Ext.define("CM.Discussion.CreateTopic", {
     extend: 'Ext.form.Panel',
 
-	initComponent: function() {
+    initComponent: function() {
+        if(SessionGlobals.role == 2 /* Professor */) {
+            this.hasDateRange = true;
+            this.openRange = Ext.create('Extensible.form.field.DateRange', {
+                fieldLabel: 'Date range',
+                name: 'open-range',
+                singleLine: true,
+                anchor: '100%'
+            });
+        } else {
+            this.hasDateRange = false;
+            this.openRange = {
+                xtype: 'hidden',
+                name: 'dummy',
+                value: 'i don\'t care'
+            };
+        }
 
         if(SessionGlobals.role == 2 /* Professor */) {
             this.hasDateRange = true;
@@ -44,7 +60,7 @@ Ext.define("CM.Discussion.CreateTopic", {
                     name: 'topic-name',
                     fieldLabel: 'Topic Name',
                     anchor: '100%',
-                    allowBlank: false,
+                    allowBlank: false
                 },
                 this.openRange,
                 {
@@ -94,14 +110,22 @@ Ext.define("CM.Discussion.CreateTopic", {
     postTopic: function() {
         var form = this.up('form');
         if(form.getForm().isValid()) {
+<<<<<<< HEAD
             if(form.instance.hasDateRange) {
+=======
+        if(form.instance.hasDateRange) {
+>>>>>>> upstream/master
                 var dates = form.instance.openRange.getValue();
                 form.getForm().findField("start-date").setValue(form.instance.dateToString(dates[0]));
                 form.getForm().findField("end-date").setValue(form.instance.dateToString(dates[1]));
             }
 
             form.submit({
+<<<<<<< HEAD
                 success: function(f, action) {
+=======
+                success: function() {
+>>>>>>> upstream/master
                     PageGlobals.contentPanel.add(new CM.Discussion.Topic({ class: form.instance.class, courseId: form.instance.courseId,
                         boardId: form.instance.boardId, boardName: form.instance.boardName, topicId: action.result.topicId,
                         topicName: form.getForm().findField("topic-name").getValue(), newPost: false }));
