@@ -248,15 +248,15 @@ public abstract class DatabaseConnectionManager {
         "FOREIGN KEY (course) REFERENCES course(id));";
     private static final String EVENT_TABLE_SCRIPT =
         "create table event(" +
-        "id     INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-        "name   VARCHAR(256) NOT NULL," +
-        "descr  VARCHAR(512) NOT NULL," +
-        "start  DATETIME     NOT NULL," +
-        "end    DATETIME     NOT NULL," +
-        "disp   DATETIME     NOT NULL," +
-        "owner  INT          NOT NULL," +
-        "course INT," +
-        "type   INT," +
+        "id      INT          NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+        "name    VARCHAR(256) NOT NULL," +
+        "descr   VARCHAR(512) NOT NULL," +
+        "start   DATETIME     NOT NULL," +
+        "end     DATETIME     NOT NULL," +
+        "visible DATETIME     NOT NULL," +
+        "owner   INT          NOT NULL," +
+        "course  INT," +
+        "type    INT," +
         "FOREIGN KEY (owner) REFERENCES user(id));";
     private static final String FOLDER_TABLE_SCRIPT =
         "create table folder(" +

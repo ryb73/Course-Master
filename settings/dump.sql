@@ -121,7 +121,7 @@ CREATE TABLE `event` (
   `descr` varchar(512) NOT NULL,
   `start` datetime NOT NULL,
   `end` datetime NOT NULL,
-  `disp` datetime NOT NULL,
+  `visible` datetime NOT NULL,
   `owner` int(11) NOT NULL,
   `course` int(11) DEFAULT NULL,
   `type` int(11) DEFAULT NULL,

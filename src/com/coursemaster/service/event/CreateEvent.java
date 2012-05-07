@@ -31,7 +31,7 @@ public class CreateEvent extends AbstractService {
             char type = (session.getRole().equals(Role.PROFESSOR)) ? '0' : '1';
 
             int res = DatabaseConnectionManager.executeInsert(String.format(
-               "insert into event (name, descr, start, end, disp, owner, course, type)" +
+               "insert into event (name, descr, start, end, visible, owner, course, type)" +
               " values ('%s', '%s', '%s', '%s', %s, %s, %s, %c);",
             name, descr, start, end, visible, userId, course, type));
 
