@@ -23,6 +23,7 @@ Ext.define("CM.Dropbox.Pane", {
         });
       
 		var dpanel = Ext.create('Ext.grid.Panel', {
+			courseId: this.courseId,
 			border: true,
 			store: dropboxes,
 				id: this.class + '-dropbox-left',
@@ -100,22 +101,22 @@ Ext.define("CM.Dropbox.Pane", {
 		flex : 2,
 		columns: {
 			items: [{
-				text: 'ID',
-				width: 25,
-				flex:1,
-				dataIndex: 'id' 
-			}, {
+				// text: 'ID',
+				// width: 25,
+				// flex:1,
+				// dataIndex: 'id' 
+			// }, {
 				text: 'Name',
 				width: 800,
 				flex: 2,
 				dataIndex: 'name'
+			// }, {
+				// text: 'Path',
+				// width: 800,
+				// flex: 1,
+				// dataIndex: 'path' 
 			}, {
-				text: 'Path',
-				width: 800,
-				flex: 1,
-				dataIndex: 'path' 
-			}, {
-				text: 'Owner',
+				text: 'Submitted By',
 				width: 800,
 				flex: 1,
 				dataIndex: 'owner' 
@@ -136,6 +137,7 @@ Ext.define("CM.Dropbox.Pane", {
     });
     
     var spanel = Ext.create('Ext.panel.Panel', {
+		courseId: this.courseId,
 		fid : this.fid,
 		border: true,
 		id: this.class + '-dropbox-rights',
@@ -144,6 +146,7 @@ Ext.define("CM.Dropbox.Pane", {
 		flex : 2,
 		items: {  
 			xtype: 'form',
+			courseId: this.courseId,
 			url: '/service/submit-file',  //TODO need name,course,descr
 			// layout: {
 			// type: 'vbox',
@@ -165,10 +168,16 @@ Ext.define("CM.Dropbox.Pane", {
 				name: 'file1',
 				anchor: '100%',
 				fieldLabel: 'File'
-			},{ 
+			},{
+				xtype: 'textfield',
+				name: 'folder',
+				anchor: '100%',
+				fieldLabel: 'Folder ID',
+				allowBlank: false
+			},{			
 				xtype: 'textarea',
 				name: 'info',
-				anchor: '100% 10%',
+				anchor: '100% 30%',
 				fieldLabel: 'Details',
 				//          height: 160,
 				allowBlank: false
@@ -177,17 +186,16 @@ Ext.define("CM.Dropbox.Pane", {
 				xtype: 'hidden',
 				name: 'owner',
 				value: SessionGlobals.id  //USERID
-			},{
+			// },{
 
-				xtype: 'hidden',
-				name: 'folder',
-//				value: this.dpanel.getSelectionModel().selected.items[0].data.id
-				value: this.fid
+				// xtype: 'hidden',
+				// name: 'folder',
+				// value: this.dpanel.getSelectionModel().selected.items[0].data.id
+				// value: this.fid
 			},{
 				xtype: 'hidden',
 				name: 'course',
-	//            value: this.ownerCT.courseId
-				value: this.courseId
+	            value: this.courseId
 			}],
 			buttons: [{
 				text: 'Upload',
@@ -232,8 +240,8 @@ Ext.define("CM.Dropbox.Pane", {
     if(SessionGlobals.role == 1) {
 		Ext.apply(this, {
 			items : [
-				dpanel,
-				spanel
+				Ext.apply(dpanel,{courseId : this.courseId}),
+				Ext.apply(spanel,{courseId : this.courseId})
 			]
 		});
     };  
@@ -284,4 +292,12 @@ addBoard: function() {
 				anchor: '100%',
 				fieldLabel: 'Name',
 				allowBlank: false
-			},{ 				xtype: 'textarea',  				name: 'ext',				anchor: '100% -20',				fieldLabel: 'Info',				//          height: 160,				allowBlank: false			},{				xtype: 'hidden',				name: 'course',				//            value: this.ownerCT.courseId				value: this.courseId 			}],			buttons: [{				text: 'Create Dropbox',				formBind: true,				disabled: true,				handler: function() {					var form = this.up('form').getForm();					if(form.isValid()) {						form.submit({							success: function() { Ext.Msg.alert("Success","Dropbox has been added."); },							failure: function() { Ext.Msg.alert("Error","Unable to add dropbox."); }						});					}				}			}]		}	}).show();  }});
+			},{
+				xtype: 'textfield',
+				name: 'course',
+				anchor: '100%',
+				fieldLabel: 'Course',
+				allowBlank: false
+			},{ 				xtype: 'textarea',  				name: 'ext',				anchor: '100% 80%',				fieldLabel: 'Info',				//          height: 160,				allowBlank: false
+			// },{
+				// xtype: 'hidden',				// name: 'course',				// value: this.courseId 			}],			buttons: [{				text: 'Create Dropbox',				formBind: true,				disabled: true,				handler: function() {					var form = this.up('form').getForm();					if(form.isValid()) {						form.submit({							success: function() { Ext.Msg.alert("Success","Dropbox has been added."); },							failure: function() { Ext.Msg.alert("Error","Unable to add dropbox."); }						});					}				}			}]		}	}).show();  }});
