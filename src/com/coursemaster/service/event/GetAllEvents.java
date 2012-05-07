@@ -30,7 +30,7 @@ public class GetAllEvents extends AbstractService {
             "    join course c on c.id = e.course" +
             "    join user u on u.id = e.user" +
             "    where u.id = %s)" +
-            " and disp < NOW()" +
+            " and visible < NOW()" +
             " and type = 0);", userId, userId));
 
         try {
